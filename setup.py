@@ -6,7 +6,7 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     install_requires=[
-        'flask', "six", "enum34", 'flask_login',
+        'flask', "six", "enum34", 'flask_login', 'flask_sqlalchemy'
     ],
     test_suite='ghostwriter.test',
 )
