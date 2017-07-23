@@ -10,6 +10,7 @@ class Post(object):
         self._title = title
         self._creation_date = creation_date
         self._id = -1
+        self._content = ""
         
     def setContent(self, data):
         """ Set the post content. 

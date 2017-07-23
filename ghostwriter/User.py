@@ -17,11 +17,20 @@ class User(object):
         """ Log in the user. Uses SHA1 to encode the password """
         u = get_user_manager()
         password_hash = hashlib.sha1(password.encode('utf-8')).hexdigest()
-        if not u.registerLogIn(self.username, password_hash):
+        stoken = u.registerLogIn(self, password_hash)
+        if stoken is None:
             return False
 
+        self.session_token = stoken.decode('utf-8')
         self._authenticated = True
         return True
+
+    @property
+    def uid(self):
+        return self._id
+
+
+    # flask_login proprierties and methods
 
     @property
     def is_authenticated(self):
@@ -36,8 +45,8 @@ class User(object):
         return (self._id < 0)
 
     def get_id(self):
-        return unicode(self._id + ':' + self.session_token)
-
+        return (str(self._id) + '|' + self.session_token)
+    
     @property
     def username(self):
         return self._username
@@ -46,35 +55,45 @@ class User(object):
     def name(self):
         return self._name
 
+
+    def __repr__(self):
+        return '<User {}, is_auth={}, session_token={}, name={} >'.format(
+                self._username, self._authenticated, self.session_token, self._name)
+
 class UserManager():
-    from ghostwriter.models.models import MUser
+
     def __init__(self):
         self.logged_list = []
 
     def registerLogIn(self, user, password_hash):
         """ Register login in database.
-            Return true if login is OK, false if it isn't """
-        mu = MUser.query.filter((MUser.username == user.username) and
-                                (MUser.password_hash == password_hash))
-
-        if (mu is None):
-            return False
-
-        user.session_token = unicode(str(datetime))
-        self.logged_list.append(user)
-        return True
-
-    def getLoggedUserbyToken(self, user):
-        users = (u for u in self.logged_list 
-                    if (u.session_token == user.session_token) and
-                    (u.ID == user.ID))
-        if len(users) <= 0:
+            Return the session token if login is OK, None if it isn't """
+        from ghostwriter.models.models import MUser
+        from sqlalchemy import and_
+        mu = MUser.query.filter(and_(MUser.username == user.username, 
+                                MUser.password_hash == password_hash))
+        if (len(mu.all()) <= 0):
             return None
 
-        return users[0]
+        session_token = str(datetime.utcnow()).encode('utf-8')
+        self.logged_list.append(user)
+        return session_token
+
+    def getLoggedUsersbyToken(self, token):
+        from ghostwriter.models.models import MUser
+        us = []
+        for user in self.logged_list:
+            if user.session_token == token:
+                us.append(user)
+
+        if len(us) <= 0:
+            return None
+
+        return us
 
 
     def getUserbyID(self, uid):
+        from ghostwriter.models.models import MUser
         mu = MUser.query.get(postid)
         if mu is None:
             return None
@@ -84,6 +103,7 @@ class UserManager():
         return u;
 
     def getAllUsers(self):
+        from ghostwriter.models.models import MUser
         mus = MUser.query.all()
         if mus is None:
             return None
@@ -98,7 +118,8 @@ class UserManager():
 
 
     def getUserbyUsername(self, uname):
-        mu = MUser.query.filter_by(username=uname)
+        from ghostwriter.models.models import MUser
+        mu = MUser.query.filter_by(username=uname).first()
         if mu is None:
             return None
 

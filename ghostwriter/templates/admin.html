@@ -7,13 +7,20 @@
 	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='admin.css') }}" />
 </head>
 <body>
-	<form action="admin/login" method="post">
+	{% with message = get_flashed_messages() %}
+	{% if message %}
+	<div id="error">
+		{{ message[0] }}
+	</div>
+	{% endif %}
+	{% endwith %}
+		
+	<form action="{{ url_for('do_login') }}" method="post">
 		<input type="text" name="username" placeholder="Username" />
 		<input type="password" name="pass" placeholder="Password" />
 		<input type="submit" value="Log in" />
 	</form>
 	
-
 	<footer>
 		Ghostwriter - Licensed under MIT License <br/>
 		Copyright &copy; 2017 Arthur M
