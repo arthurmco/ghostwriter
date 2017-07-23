@@ -23,6 +23,30 @@ class MPost(models.Model):
         return '<Post title={} creation_date={}>'.format(self.title, self.creation_date)
 
 
+class MUser(models.Model):
+    id = models.Column(models.Integer, primary_key=True)
+    username = models.Column(models.String(64), unique=True)
+    password_hash = models.Column(models.String(512))
+    name = models.Column(models.String(128))
+
+    def __init__(self, username, password_hash, name=None):
+        self.username = username
+        self.password_hash = password_hash
+        if name is None:
+            self.name = username
+        else:
+            self.name = name
+
+
+    def __repr__(self):
+        return '<User username={} pwd_hash={} name={}'.format(self.username, self.password_hash, self.name)
+
+
+
+
+
+
+
 def db_create_all():
     models.create_all()
 

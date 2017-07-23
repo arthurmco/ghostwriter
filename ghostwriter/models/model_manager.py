@@ -20,14 +20,13 @@ class ModelManager(object):
     def create(self):
         from ghostwriter.models.models import db_create_all
         """ Create the database. Only do this ONLY ONE F****ING TIME """
+        self.drop()
         db_create_all()
-        from ghostwriter.models.models import MPost
-        from datetime import datetime
-        self._database.session.add(
-                MPost('Test TItle', datetime.utcnow(), "Test content"))
-        self._database.session.add(
-                MPost('No content title', datetime.utcnow()))
+
         self._database.session.commit()
+
+    def drop(self):
+        self._database.drop_all()
 
     @property
     def database(self):
