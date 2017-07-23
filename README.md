@@ -12,3 +12,9 @@ your way.
 **THIS SOFTWARE IS UNDER DEVELOPMENT**
 
 This software is licensed under the MIT License
+
+### Running
+
+To test, simply run flask with the `FLASK_APP` environment variable as `ghostwriter`. 
+
+The '/' route contains a test message. In the future, that message will be removable
