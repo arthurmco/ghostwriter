@@ -1,8 +1,8 @@
 #  GhostWriter main file 
 #  Copyright (C) 2017 Arthur M
 #
-from flask import Flask, request, jsonify, render_template
-from flask_login import LoginManager, login_user, logout_user, current_user
+from flask import Flask, request, jsonify, render_template, flash, redirect
+from flask_login import LoginManager, login_user, logout_user, current_user, login_required
 from ghostwriter.models.model_manager import ModelManager
 
 app = Flask("ghostwriter");
@@ -16,8 +16,21 @@ login_manager.init_app(app)
 
 @login_manager.user_loader
 def load_user(session_id):
+    from ghostwriter.User import UserManager, get_user_manager
     um = get_user_manager()
-    return um.getLoggedUserbyToken(session_id)
+  
+    session_parts = str(session_id).split('|')
+
+    us = um.getLoggedUsersbyToken(session_parts[1])
+    if not us:
+        return None
+
+    for u in us:
+        if u.uid == int(session_parts[0]):
+            return u
+
+
+    return None
 
 # Test route
 @app.route('/')
@@ -45,6 +58,9 @@ def post_get_content(id):
         return post.getContent()
 
     if request.method == 'PUT':
+        if not current_user.is_authenticated:
+            return login_manager.unauthorized()
+
         post.setContent(request.form['content'])
         pm.updatePostContent(post)
         return '',200
@@ -72,6 +88,7 @@ def post_get(id):
 
 
 @app.route('/api/post/create/', methods=['POST'])
+@login_required
 def post_create():
     """
         Creates post
@@ -95,9 +112,35 @@ def post_create():
 def show_admin_panel():
     return render_template('admin.html')
 
-@app.route('/admin/login/', methods=['POST'])
+@app.route('/admin/login', methods=['POST'])
 def do_login():
-    pass
+
+    username = request.form['username']
+    password = request.form['password']
+
+    from ghostwriter.User import User, UserManager
+
+    um = UserManager()
+    u = um.getUserbyUsername(username)
+
+    if u is None:
+        flash('User does not exist')
+        return render_template('admin.html'), 401
+
+    if not u.login(password):
+        flash('Invalid user or password')
+        return render_template('admin.html'), 401
+
+    login_user(u)
+    return "Logged in", 200 
+    
+
+@app.route('/admin/logoff', methods=['GET'])
+@login_required
+def do_logout():
+    logout_user()
+    return redirect(show_admin_panel), 200
+
 # Commands
 
 @app.cli.command()
@@ -110,4 +153,4 @@ def initdb():
     except Exception as e:
         app.logger.error('Error while creating database: {}'.format(e))
 
-
+app.secret_key = 'B1Ad99013yX R~XHHHHHHHHHH/,?RT'

@@ -40,7 +40,6 @@ class LoginTestCase(unittest.TestCase):
     def setUp(self):
         self.app = app.test_client()
         mm.setDatabaseURI('sqlite:////tmp/unittest.db')
-        #mm.init()
         mm.create()
         self.username = ""
         self.password = ""
@@ -63,7 +62,7 @@ class LoginTestCase(unittest.TestCase):
             data = {
                 'username': 'devaxos',
                 'password': self.password
-            })
+            }, follow_redirects=True)
 
         self.assertTrue(res.status == "401 UNAUTHORIZED")  
 
@@ -73,10 +72,9 @@ class LoginTestCase(unittest.TestCase):
             data = {
                 'username': self.username,
                 'password': 'garotoixpertinho'
-            })
+            }, follow_redirects=True)
 
         self.assertTrue(res.status == "401 UNAUTHORIZED")  
-        pass
 
     def test_login(self):
         us = self.create_user()
@@ -84,7 +82,7 @@ class LoginTestCase(unittest.TestCase):
             data = {
                 'username': self.username,
                 'password': self.password
-            })
+            }, follow_redirects=True)
 
         self.assertTrue(res.status == "200 OK")
 
@@ -94,11 +92,11 @@ class LoginTestCase(unittest.TestCase):
             data = {
                 'username': self.username,
                 'password': self.password
-            })
+            }, follow_redirects=True)
 
         self.assertTrue(res.status == "200 OK")  
 
-        res = self.app.get('/admin/logoff')
+        res = self.app.get('/admin/logoff', follow_redirects=True)
         self.assertTrue(res.status == "200 OK")  
         
 
@@ -108,13 +106,13 @@ class LoginTestCase(unittest.TestCase):
             data = {
                 'username': self.username,
                 'password': self.password
-            })
+            }, follow_redirects=True)
 
         self.assertTrue(res.status == "200 OK")  
-        res = self.app.post('/api/post/create',
+        res = self.app.post('/api/post/create/',
             data = {
                 'title': 'Test Post'
-            })
+            }, follow_redirects=True)
 
         self.assertTrue(res.status == "200 OK")  
         # TODO: check returned JSON
@@ -126,23 +124,21 @@ class LoginTestCase(unittest.TestCase):
             data = {
                 'username': self.username,
                 'password': self.password
-            })
+            }, follow_redirects=True)
 
         self.assertTrue(res.status == "200 OK")  
         
-        res = self.app.get('/admin/logoff')
+        res = self.app.get('/admin/logoff', follow_redirects=True)
         self.assertTrue(res.status == "200 OK")  
         
-        res = self.app.post('/api/post/create',
+        res = self.app.post('/api/post/create/',
             data = {
                 'title': 'Test Post'
-            })
+            }, follow_redirects=True)
 
         self.assertTrue(res.status == "401 UNAUTHORIZED")  
 
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)
-
-
 
