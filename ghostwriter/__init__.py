@@ -1,7 +1,8 @@
 #  GhostWriter main file 
 #  Copyright (C) 2017 Arthur M
 #
-from flask import Flask, request, jsonify;
+from flask import Flask, request, jsonify, render_template
+from flask_login import LoginManager, login_user, logout_user, current_user
 from ghostwriter.models.model_manager import ModelManager
 
 app = Flask("ghostwriter");
@@ -9,6 +10,14 @@ app = Flask("ghostwriter");
 mm = ModelManager(app)
 mm.setDatabaseURI('sqlite:////tmp/test.db')
 mm.init()
+
+login_manager = LoginManager()
+login_manager.init_app(app)
+
+@login_manager.user_loader
+def load_user(session_id):
+    um = get_user_manager()
+    return um.getLoggedUserbyToken(session_id)
 
 # Test route
 @app.route('/')
@@ -84,7 +93,12 @@ def post_create():
 # Admin interface
 @app.route('/admin')
 def show_admin_panel():
-    return 'admin'
+    return render_template('admin.html')
+
+@app.route('/admin/login/', methods=['POST'])
+def do_login():
+    pass
+# Commands
 
 @app.cli.command()
 def initdb():

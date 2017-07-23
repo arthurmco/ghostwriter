@@ -1,0 +1,23 @@
+<!DOCTYPE html5>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Ghostwriter - Admin Panel </title>
+
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='admin.css') }}" />
+</head>
+<body>
+	<form action="admin/login" method="post">
+		<input type="text" name="username" placeholder="Username" />
+		<input type="password" name="pass" placeholder="Password" />
+		<input type="submit" value="Log in" />
+	</form>
+	
+
+	<footer>
+		Ghostwriter - Licensed under MIT License <br/>
+		Copyright &copy; 2017 Arthur M
+	</footer>
+</body>
+</html>
+
