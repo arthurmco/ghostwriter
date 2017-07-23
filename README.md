@@ -13,8 +13,18 @@ your way.
 
 This software is licensed under the MIT License
 
-### Running
+## Installing
+
+ - Clone this repository
+ - Create a virtualenv and enter it
+ - Run `pip install -e . `
+ - Run `FLASK_APP=ghostwriter flask initdb`. This will create the database and 
+   the needed tables
+
+## Running
 
 To test, simply run flask with the `FLASK_APP` environment variable as `ghostwriter`. 
+
+You may want to run ghostwriter in a WSGI environment. Although isn't supported yet, I'd love some testing.
 
 The '/' route contains a test message. In the future, that message will be removable

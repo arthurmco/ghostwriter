@@ -86,6 +86,14 @@ def post_create():
 def show_admin_panel():
     return 'admin'
 
+@app.cli.command()
+def initdb():
+    """ Initialise the database """
+    app.logger.info('Creating database')
+    try:
+        mm.create()
+        app.logger.info('Database created')
+    except Exception as e:
+        app.logger.error('Error while creating database: {}'.format(e))
 
-mm.create() # Please remove this, for the love of god
 
