@@ -9,10 +9,12 @@ class Post(object):
     def __init__(self, title):
         self.title = titie
         self.creation_date = datetime.now() 
+        self.id = -1
 
     def __init__(self, title, creation_date):
         self.title = title
         self.creation_date = creation_date
+        self.id = -1
         
     def setContent(self, data):
         """ Set the post content. 
@@ -60,4 +62,8 @@ class Post(object):
     @creation_date.setter
     def creation_date(self, date):
         self.creation_date = date
+
+    @property
+    def ID(self):
+        return self.id
             
