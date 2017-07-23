@@ -1,5 +1,5 @@
 #  GhostWriter main file 
-#
+#  Copyright (C) 2017 Arthur M
 #
 
 

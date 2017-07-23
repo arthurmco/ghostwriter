@@ -1,6 +1,7 @@
 #   Represents a blog post
 #
 #   This file is from the Ghostwriter software
+#   Copyright (C) 2017 Arthur M
 
 from datetime import datetime
 
