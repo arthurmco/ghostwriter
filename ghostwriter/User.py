@@ -6,6 +6,13 @@
 from datetime import datetime
 
 class User(object):
+    """
+        This user class is a wrapper between the flask_login user class and
+        the user database
+
+        Some decisions (like storing the session token as a utf-8 string) were
+        done to be compatible with this library
+    """
     def __init__(self, username, name=None):
         self._username = username
         self._name = username if name is None else name

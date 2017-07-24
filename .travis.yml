@@ -1,0 +1,11 @@
+# Travis CI build file for Ghostwriter
+#
+# Copyright (C) 2017 Arthur M
+
+language: python
+python:
+        - "2.7"
+        - "3.6"
+install: "pip install -e ."
+script: pythom -m ghostwriter.test
+
