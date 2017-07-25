@@ -1,0 +1,177 @@
+{% extends "menu.html" %}
+{% block title %} Ghostwriter - Add Post {% endblock %}
+
+{% block body %}
+
+<h1>Create Post</h1>
+
+<div id="error"> </div>
+<div id="success"> </div>
+<script type="text/javascript">
+
+var post_data = {};
+
+function put_content() {
+	var content = $("textarea[name=content]").val();
+	var isuccess = $("#success");
+	var bAdd = $("#btnAdd");
+	var bEdit = $("#btnEdit");
+	$.ajax({
+		cache: false,
+		data: 'content='+content,
+		method: 'PUT',
+		url: '/api/post/'+post_data.id+'/content',
+		success: function(val) {
+			isuccess.text('Post added successfully!');
+			if (bAdd.length > 0) {
+				bAdd.css('visibility', 'hidden');
+				bEdit.css('visibility', 'visible');
+			}
+
+		},
+		error: function(xhr, strstatus) {
+			ierror.text('An error occurred while setting content: ' + strstatus);
+
+		}
+	});
+	
+}
+
+function run_open_content(id, content) {
+	var ierror = $("#error");
+
+	$.ajax({
+		cache: false,
+		method: 'GET',
+		url: '/api/post/'+id+'/content',
+		success: function(val) {
+			content.val(val);
+		},
+		error: function(xhr, strstatus) {
+			ierror.text('An error occurred while opening content');
+			return;
+		}
+	});
+
+
+}
+
+function run_open_post(id) {
+	var title = $("input[name=title]");
+	var content = $("textarea[name=content]");
+	var ierror = $("#error");
+
+	$.ajax({
+		cache: false,
+		method: 'GET',
+		dataType: 'json',
+		url: '/api/post/'+id+'/',
+		success: function(val) {
+			post_data = val;
+
+			title.prop('value', val.title);
+			run_open_content(id, content);
+		},
+		statusCode: {
+			404: function() {
+				ierror.text('The post could not be found');
+				title.prop('disabled', 'disabled');
+				content.prop('disabled', 'disabled');
+			}
+		},
+		error: function(xhr, strstatus) {
+			ierror.text('An error occurred while opening');
+			return;
+		}
+	});
+
+
+}
+
+function run_edit_post(id) {
+	if (post_data.id < 0) 
+		return;
+	
+	var title = $("input[name=title]").prop('value');
+	var content = $("textarea[name=content]").val();
+	var ierror = $("#error");
+	
+	if (title.length <= 1) {
+		ierror.text('Please type a title');
+		return;
+	}
+
+	if (content.length <= 1) {
+		ierror.text('Please type something in content');
+		return;
+	}
+
+	$.ajax({
+		cache: false,
+		data: 'title='+title,
+		method: 'PUT',
+		dataType: 'json',
+		url: '/api/post/'+post_data.id+'/',
+		success: function(val) {
+			post_data = val;
+			put_content();
+		},
+		error: function(xhr, strstatus) {
+			ierror.text('An error occurred: ' + strstatus);
+			return;
+		}
+	});
+}
+
+function run_add_post() {
+	
+	var title = $("input[name=title]").prop('value');
+	var content = $("textarea[name=content]").val();
+	var ierror = $("#error");
+	
+	if (title.length <= 1) {
+		ierror.text('Please type a title');
+		return;
+	}
+
+	if (content.length <= 1) {
+		ierror.text('Please type something in content');
+		return;
+	}
+
+	$.ajax({
+		cache: false,
+		data: 'title='+title,
+		method: 'PUT',
+		dataType: 'json',
+		url: '{{ url_for("post_create") }}',
+		success: function(val) {
+			console.log(val);
+			post_data = val;
+			put_content();
+		},
+		error: function(xhr, strstatus) {
+			ierror.text('An error occurred: ' + strstatus);
+			return;
+		}
+	});
+}
+
+$(document).ready(function () {
+	{% if action == 'edit'%}
+	run_open_post({{ postid }});
+	{% endif %}
+});
+
+</script>
+
+<form action="#" method="post">
+	<input type="text" name="title" size="70" placeholder="Title" /><br/>
+	<textarea rows="20" name="content" cols="75" placeholder="Content"> </textarea><br/>
+	<hr />
+	<input type="button" id="btnAdd" value="Add" onClick="run_add_post()" style="{{ 'visibility: hidden;' if not (action == 'create') }}" />
+	<input type="button" id="btnEdit" value="Edit" onClick="run_edit_post()" style="{{ 'visibility: hidden;' if not (action == 'edit') }}" />
+</form>
+
+
+{% endblock %}

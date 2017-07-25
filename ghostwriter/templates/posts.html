@@ -7,11 +7,51 @@
 
 <a href="{{ url_for('admin_create_post') }}">Create Post</a>
 
-<table>
+<script type="text/javascript">
+$(document).ready( function () {
+	var table = $("#posts_table");
+
+	$.ajax({
+		cache: false,
+		method: 'GET',
+		dataType: 'json',
+		url: '{{ url_for('posts_get') }}',
+		success: function(posts) {
+			$.each(posts, (idx, val) => {
+				var pitem = $("<tr>");
+				pitem.append($("<td>"+val.id+"</td>"));
+				pitem.append($("<td>"+val.title+"</td>"));
+				pitem.append($("<td>"+val.creation_date+"</td>"));
+				pitem.append($("<td><a href='/admin/posts/edit/"+val.id+"/'>Edit</td>"));
+				table.append(pitem);
+
+			});
+		},
+		statusCode: {
+			404: function() {
+				table.append("<tr><td colspan='4'>"+
+					"No posts found</td></tr>");
+				return;					
+			}
+		},
+		error: function(xhr, strstatus) {
+			table.append("<tr><td colspan='4'>"+
+				"An error occurred</td></tr>");
+			return;					
+		}
+		
+	});
+
+});
+</script>
+
+
+<table id="posts_table">
 	<tr>
 		<th>ID</th>
 		<th>Title</th>
 		<th>Creation Date</th>
+		<th><!-- Edit --></th>
 	</tr>
 </table>
 

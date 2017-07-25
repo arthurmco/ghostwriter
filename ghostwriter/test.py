@@ -127,6 +127,30 @@ class PostArticleTestCase(unittest.TestCase):
         self.assertEqual(b'New Post content', post_data)
         self.deauthenticate()
 
+    def test_set_and_get_metadata(self):
+        self.authenticate()
+        from ghostwriter.Post import Post, PostManager
+        from flask import json
+        
+        p = Post('Get Meta Test')
+        p.setContent('Post content')
+        pm = PostManager()
+        pm.addPost(p)
+
+        res = self.app.put('/api/post/'+str(p.ID)+'/',
+                data = {
+                    'title': 'New Meta Test'
+                },
+                follow_redirects=True)
+        self.assertEquals(res.status,  '200 OK')
+
+        res = self.app.get('/api/post/'+str(p.ID)+'/',
+                follow_redirects=True)
+        self.assertEquals(res.status,  '200 OK')
+        post_data = json.loads(res.data)
+        self.assertEqual('New Meta Test', post_data['title'])
+        self.deauthenticate()
+
     def test_delete_blog_post(self):
         self.authenticate()
         from ghostwriter.Post import Post, PostManager
