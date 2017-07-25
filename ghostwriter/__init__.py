@@ -1,7 +1,7 @@
 #  GhostWriter main file 
 #  Copyright (C) 2017 Arthur M
 #
-from flask import Flask, request, jsonify, render_template, flash, redirect
+from flask import Flask, request, jsonify, render_template, flash, redirect, url_for
 from flask_login import LoginManager, login_user, logout_user, current_user, login_required
 from ghostwriter.models.modelmanager import ModelManager
 
@@ -119,14 +119,15 @@ def show_admin_panel():
 
 @app.route('/admin/login', methods=['POST'])
 def do_login():
-
     username = request.form['username']
     password = request.form['password']
+    print(username)
+    print(password)
 
     from ghostwriter.User import User, UserManager
-
     um = UserManager()
     u = um.getUserbyUsername(username)
+    print(u)
 
     if u is None:
         flash('User does not exist')
@@ -137,14 +138,18 @@ def do_login():
         return render_template('admin.html'), 401
 
     login_user(u)
-    return "Logged in", 200 
+    return redirect(url_for('show_main_admin'))
+
+@app.route('/admin/panel', methods=['GET'])
+def show_main_admin():
+    return render_template('main.html')
     
 
 @app.route('/admin/logoff', methods=['GET'])
 @login_required
 def do_logout():
     logout_user()
-    return redirect(show_admin_panel), 200
+    return redirect(url_for('show_admin_panel'))
 
 # Commands
 
@@ -154,6 +159,10 @@ def initdb():
     app.logger.info('Creating database')
     try:
         mm.create()
+        from ghostwriter.User import User, UserManager
+        um = UserManager()
+        um.addUser(User('admin', 'Administrator'), 'admin')
+
         app.logger.info('Database created')
     except Exception as e:
         app.logger.error('Error while creating database: {}'.format(e))

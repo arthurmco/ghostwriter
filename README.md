@@ -30,3 +30,5 @@ To test, simply run flask with the `FLASK_APP` environment variable as `ghostwri
 You may want to run ghostwriter in a WSGI environment. Although isn't supported yet, I'd love some testing.
 
 The '/' route contains a test message. In the future, that message will be removable
+
+The default login is 'admin' with password 'admin'
