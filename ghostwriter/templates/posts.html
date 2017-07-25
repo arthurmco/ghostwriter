@@ -1,0 +1,19 @@
+{% extends "menu.html" %}
+{% block title %} Ghostwriter - Posts {% endblock %}
+
+{% block body %}
+
+<h1>Posts</h1>
+
+<a href="{{ url_for('admin_create_post') }}">Create Post</a>
+
+<table>
+	<tr>
+		<th>ID</th>
+		<th>Title</th>
+		<th>Creation Date</th>
+	</tr>
+</table>
+
+
+{% endblock %}
