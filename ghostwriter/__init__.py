@@ -141,8 +141,24 @@ def do_login():
     return redirect(url_for('show_main_admin'))
 
 @app.route('/admin/panel', methods=['GET'])
+@login_required
 def show_main_admin():
-    return render_template('main.html')
+    return render_template('main.html', navlink='dashboard')
+
+@app.route('/admin/users', methods=['GET'])
+@login_required
+def show_users():
+    return render_template('users.html', navlink='users')
+
+@app.route('/admin/posts', methods=['GET'])
+@login_required
+def show_posts():
+    return render_template('posts.html', navlink='posts')
+
+@app.route('/admin/posts/create', methods=['GET'])
+@login_required
+def admin_create_post():
+    return render_template('create_post.html', navlink='posts')
     
 
 @app.route('/admin/logoff', methods=['GET'])
