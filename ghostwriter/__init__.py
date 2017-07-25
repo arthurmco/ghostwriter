@@ -3,7 +3,7 @@
 #
 from flask import Flask, request, jsonify, render_template, flash, redirect
 from flask_login import LoginManager, login_user, logout_user, current_user, login_required
-from ghostwriter.models.model_manager import ModelManager
+from ghostwriter.models.modelmanager import ModelManager
 
 app = Flask("ghostwriter");
 

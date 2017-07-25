@@ -21,7 +21,6 @@ class PostArticleTestCase(unittest.TestCase):
 
 
     def tearDown(self):
-        print('goodbye')
         mm.drop()
 
     def create_user(self):
