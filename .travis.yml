@@ -7,5 +7,5 @@ python:
         - "2.7"
         - "3.6"
 install: "pip install -e ."
-script: pythom -m ghostwriter.test
+script: python -m ghostwriter.test
 

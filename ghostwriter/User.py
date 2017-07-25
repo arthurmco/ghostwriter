@@ -18,6 +18,7 @@ class User(object):
         self._name = username if name is None else name
         self._id = -1
         self.session_token = 'UL'
+        self._authenticated = False
 
     def login(self, password):
         import hashlib
@@ -64,8 +65,8 @@ class User(object):
 
 
     def __repr__(self):
-        return '<User {}, is_auth={}, session_token={}, name={} >'.format(
-                self._username, self._authenticated, self.session_token, self._name)
+        return '<User {}, is_auth={}, session_token={}, name={} id={}>'.format(
+                self._username, self._authenticated, self.session_token, self._name, self._id)
 
 class UserManager():
 
@@ -101,7 +102,7 @@ class UserManager():
 
     def getUserbyID(self, uid):
         from ghostwriter.models.models import MUser
-        mu = MUser.query.get(postid)
+        mu = MUser.query.get(uid)
         if mu is None:
             return None
 

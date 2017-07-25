@@ -106,7 +106,7 @@ class PostManager(object):
     def updatePostMetadata(self, post):
         """ Updates post metadata """
         from ghostwriter.models.models import models
-        if post.id < 0:
+        if post._id < 0:
             return False
         
         mp = MPost.query.get(post.ID)
@@ -119,7 +119,7 @@ class PostManager(object):
     def updatePostContent(self, post):
         """ Updates post content """
         from ghostwriter.models.models import models
-        if post.id < 0:
+        if post._id < 0:
             return False
         
         mp = MPost.query.get(post.ID)
@@ -127,11 +127,12 @@ class PostManager(object):
             return False
         
         mp.content = post.getContent()
+        models.session.commit()
 
 
     def removePost(self, post):
         """ Remove a post. Return false if post does not exist """
-        if post.id < 0:
+        if post.ID < 0:
             return False
         
         mp = MPost.query.get(post.ID)

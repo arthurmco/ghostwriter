@@ -12,10 +12,10 @@ class ModelManager(object):
     def setDatabaseURI(self, path):
         self.app.config['SQLALCHEMY_DATABASE_URI'] = path
         self.app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-        self.app.config['GHOSTWRITER_DATABASE'] = self
 
     def init(self):
         self._database = SQLAlchemy(self.app)
+        self.app.config['GHOSTWRITER_DATABASE'] = self
 
     def create(self):
         from ghostwriter.models.models import db_create_all
@@ -26,6 +26,7 @@ class ModelManager(object):
         self._database.session.commit()
 
     def drop(self):
+        self._database.reflect()
         self._database.drop_all()
 
     @property
