@@ -50,6 +50,9 @@ def posts_get():
     from ghostwriter.Post import Post, PostManager 
     pm = PostManager()
     posts = pm.getAllPosts()
+    if len(posts) <= 0:
+        return jsonify({'error': 'No posts found'}), 404
+
     post_arr = []
 
     for post in posts:
@@ -60,9 +63,8 @@ def posts_get():
                  'summary': post.getSummary()
              }
         post_arr.append(post_val)
-        return jsonify(post_arr)
-    else:
-        return jsonify({'error': 'No posts found'}), 404
+        
+    return jsonify(post_arr)
 
 
 @app.route('/api/post/<int:id>/content', methods=['GET', 'PUT'])

@@ -142,7 +142,7 @@ function run_add_post() {
 	$.ajax({
 		cache: false,
 		data: 'title='+title,
-		method: 'PUT',
+		method: 'POST',
 		dataType: 'json',
 		url: '{{ url_for("post_create") }}',
 		success: function(val) {
