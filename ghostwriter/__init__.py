@@ -40,12 +40,39 @@ def test_run():
 
 
 # REST interfaces
+@app.route('/api/posts/', methods=['GET'])
+def posts_get():
+    """
+        Gets all posts
+
+        Returns a JSON with their information, without content data
+    """
+    from ghostwriter.Post import Post, PostManager 
+    pm = PostManager()
+    posts = pm.getAllPosts()
+    post_arr = []
+
+    for post in posts:
+        post_val = {   
+                 'id': post.ID,
+                 'title': post.title,
+                 'creation_date': post.creation_date.isoformat(),
+                 'summary': post.getSummary()
+             }
+        post_arr.append(post_val)
+        return jsonify(post_arr)
+    else:
+        return jsonify({'error': 'No posts found'}), 404
+
+
 @app.route('/api/post/<int:id>/content', methods=['GET', 'PUT'])
 def post_get_content(id):
     """ 
         Retrieves/sets post content
         Returns post data in its native XHTML format, or 404 if post not found
 
+        GET: Retrieve the content
+        PUT: Updates content
     """
     from ghostwriter.Post import Post, PostManager 
     pm = PostManager()
@@ -65,11 +92,17 @@ def post_get_content(id):
         pm.updatePostContent(post)
         return '',200
 
-@app.route('/api/post/<int:id>/', methods=['GET', 'DELETE'])
+
+
+@app.route('/api/post/<int:id>/', methods=['GET', 'DELETE', 'PUT'])
 def post_get(id):
     """
-        Retrieve post metadata in JSON format
+        Manage the post
         If post not found, give a 404 Not Found error
+
+        GET: Retrieve post metadata, in JSON format
+        PUT: Update any field of post metadata. Return it in JSON format
+        DELETE: Delete the post
     """
     from ghostwriter.Post import Post, PostManager
     pm = PostManager()
@@ -79,7 +112,7 @@ def post_get(id):
         return jsonify(
                 {'error': 'The post could not be found'}), 404
 
-    if request.method == 'GET':
+    if request.method == 'GET': 
         jdata = {   'id': post.ID,
                  'title': post.title,
                  'creation_date': post.creation_date.isoformat(),
@@ -89,6 +122,16 @@ def post_get(id):
     elif request.method == 'DELETE':
         pm.removePost(post)
         return "",200
+    elif request.method == 'PUT':
+        title = request.form['title']
+        post.title = title
+        pm.updatePostMetadata(post)
+        jdata = {   'id': post.ID,
+                 'title': post.title,
+                 'creation_date': post.creation_date.isoformat(),
+                 'summary': post.getSummary()
+             }
+        return jsonify(jdata), 200
     else:
         return "",405
 
@@ -121,13 +164,10 @@ def show_admin_panel():
 def do_login():
     username = request.form['username']
     password = request.form['password']
-    print(username)
-    print(password)
 
     from ghostwriter.User import User, UserManager
     um = UserManager()
     u = um.getUserbyUsername(username)
-    print(u)
 
     if u is None:
         flash('User does not exist')
@@ -158,8 +198,15 @@ def show_posts():
 @app.route('/admin/posts/create', methods=['GET'])
 @login_required
 def admin_create_post():
-    return render_template('create_post.html', navlink='posts')
+    return render_template('manage_post.html', navlink='posts', action='create')
     
+@app.route('/admin/posts/edit/<int:id>/', methods=['GET'])
+@login_required
+def edit_post(id):
+    return render_template('manage_post.html', navlink='posts',
+            action='edit', postid=id)
+
+
 
 @app.route('/admin/logoff', methods=['GET'])
 @login_required

@@ -6,8 +6,10 @@
 from datetime import datetime
 
 class Post(object):
-    def __init__(self, title, creation_date=datetime.utcnow()):
+    def __init__(self, title, creation_date=None):
         self._title = title
+        if creation_date is None:
+            creation_date = datetime.utcnow()
         self._creation_date = creation_date
         self._id = -1
         self._content = ""
@@ -90,6 +92,30 @@ class PostManager(object):
             post = Post(mp.title, mp.creation_date)
             post._id = mp.id
             post.setContent(mp.content)
+            posts.append(post)
+
+        return posts
+
+    def getAllPosts(self, start=0, end=None):
+        """
+            Get all posts, by creation date descending order, from 'start'
+            to 'start+end' .
+            If none is found, return an empty list
+
+        """
+        mpq = MPost.query.order_by(MPost.creation_date.desc()).offset(start)
+        if not (end is None):
+            mpq = mpq.limit(end)
+        
+        mp = mpq.all();
+        if mp is None:
+            return []
+        
+        posts = []
+        for mpitem in mp:
+            post = Post(mpitem.title, mpitem.creation_date)
+            post._id = mpitem.id
+            post.setContent(mpitem.content)
             posts.append(post)
 
         return posts
