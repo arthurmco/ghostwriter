@@ -65,7 +65,7 @@ def post_get_content(id):
         pm.updatePostContent(post)
         return '',200
 
-@app.route('/api/post/<int:id>/', methods=['GET'])
+@app.route('/api/post/<int:id>/', methods=['GET', 'DELETE'])
 def post_get(id):
     """
         Retrieve post metadata in JSON format
@@ -79,13 +79,18 @@ def post_get(id):
         return jsonify(
                 {'error': 'The post could not be found'}), 404
 
-    jdata = {   'id': post.ID,
-                'title': post.title,
-                'creation_date': post.creation_date.isoformat(),
-                'summary': post.getSummary()
-            }
-    return jsonify(jdata), 200
-
+    if request.method == 'GET':
+        jdata = {   'id': post.ID,
+                 'title': post.title,
+                 'creation_date': post.creation_date.isoformat(),
+                 'summary': post.getSummary()
+             }
+        return jsonify(jdata), 200
+    elif request.method == 'DELETE':
+        pm.removePost(post)
+        return "",200
+    else:
+        return "",405
 
 @app.route('/api/post/create/', methods=['POST'])
 @login_required
