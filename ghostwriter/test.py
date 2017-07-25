@@ -38,7 +38,7 @@ class PostArticleTestCase(unittest.TestCase):
                 'password': self.password
             }, follow_redirects=True)
 
-        self.assertEquals(res.status,  "200 OK")
+        self.assertEqual(res.status,  "200 OK")
 
     def deauthenticate(self):
         res = self.app.get('/admin/logoff', follow_redirects=True)
