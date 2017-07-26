@@ -13,6 +13,7 @@ class MPost(models.Model):
     title = models.Column(models.String(255), unique=True)
     creation_date = models.Column(models.DateTime, unique=True)
     content = models.Column(models.Text)
+    user_id = models.Column(models.Integer, models.ForeignKey('m_user.id'))
 
     def __init__(self, title, creation_date, content=""):
         self.title = title
@@ -28,6 +29,8 @@ class MUser(models.Model):
     username = models.Column(models.String(64), unique=True)
     password_hash = models.Column(models.String(512))
     name = models.Column(models.String(128))
+    security_flags = models.Column(models.Integer)
+    posts = models.relationship('MPost', backref='user', lazy='dynamic')
 
     def __init__(self, username, password_hash, name=None):
         self.username = username

@@ -8,11 +8,10 @@
 <body>
 	<nav>
 		<ul>
-			<li>
-				<a href="{{ url_for('show_main_admin') }}" {{ 'class=actual' if navlink == 'dashboard' }}>Dashboard</a>
-				<a href="{{ url_for('show_users') }}" {{ 'class=actual' if navlink == 'users'}}>Users</a>
-				<a href="{{ url_for('show_posts') }}" {{ 'class=actual' if navlink == 'posts'}}>Posts</a>
-				<a href="{{ url_for('do_logout') }}">Log Out</a>
+			<li><a href="{{ url_for('show_main_admin') }}" {{ 'class=actual' if navlink == 'dashboard' }}>Dashboard</a></li>
+			<li><a href="{{ url_for('show_users') }}" {{ 'class=actual' if navlink == 'users'}}>Users</a></li>
+			<li><a href="{{ url_for('show_posts') }}" {{ 'class=actual' if navlink == 'posts'}}>Posts</a></li>
+			<li><a href="{{ url_for('do_logout') }}">Log Out</a>
 			</li>
 		</ul>
 		<div id="username"> {{ current_user.name }} </div>
@@ -20,5 +19,9 @@
 	<article>
 		{% block body %}{% endblock %}
 	</article>
+	<footer>
+		Ghostwriter - Licensed under MIT License <br/>
+		Copyright &copy; 2017 Arthur M
+	</footer>
 </body>
 </html>
