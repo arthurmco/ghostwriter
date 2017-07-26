@@ -5,13 +5,93 @@
 
 <h1>Users</h1>
 
+<div id="minfo" />
+<div id="merror" />
+<input type="hidden" name="current_user" value="{{ current_user.uid }}" />
 
-<table>
+<script type="text/javascript">
+function delete_user(userid) {
+	var minfo = $("#minfo");
+	var merror = $("#merror");
+
+	$.ajax({
+		cache: false,
+		method: 'DELETE',
+		url: '/api/user/'+userid+'/',
+		success: function(val) {
+			minfo.text('User deleted successfully');	
+			$("tr[data-user-id="+userid+"]").remove();
+		},
+		statusCode: {
+			404: function() {
+				merror.text('Could not find user, not deleted');
+				return
+			}
+		},
+		error: function(xhr, strstatus) {
+			merror.text('An error occurred while deleting');
+			return;					
+		},
+	});
+}
+
+$(document).ready( function () {
+	var table = $("#users_table tbody");
+	table.empty();
+
+	var currid = $("input[name=current_user]").prop('value');
+
+	$.ajax({
+		cache: false,
+		method: 'GET',
+		dataType: 'json',
+		url: '{{ url_for('user_list_manage') }}',
+		success: function(users) {
+			$.each(users, (idx, val) => {
+				var uitem = $("<tr data-user-id='"+val.id+"'>");
+				uitem.append($("<td>"+val.id+"</td>"));
+				uitem.append($("<td>"+val.username+"</td>"));
+				uitem.append($("<td>"+val.name+"</td>"));
+				uitem.append($("<td><!--<a href='/admin/users/edit/"+val.id+"/'>Edit</a>--></td>"));
+
+				if (currid == val.id) 
+					uitem.append($("<td></td>"));
+				else
+					uitem.append($("<td><a href='#' onClick='delete_user("+val.id+")'>Delete</a></td>"));
+				table.append(uitem);
+
+			});
+		},
+		statusCode: {
+			404: function() {
+				table.empty();
+				table.append("<tr><td colspan='6'>"+
+					"No users found</td></tr>");
+				return;					
+			}
+		},
+		error: function(xhr, strstatus) {
+			table.empty();
+			table.append("<tr><td colspan='6'>"+
+				"An error occurred</td></tr>");
+			return;					
+		}
+		
+	});
+
+});
+
+</script>
+
+<table id="users_table" >
+	<thead>
 	<tr>
 		<th>ID</th>
 		<th>Name</th>
 		<th>Login</th>
 	</tr>
+	</thead>
+	<tbody />
 </table>
 
 <a href="{{ url_for('admin_create_post') }}">Create User</a>

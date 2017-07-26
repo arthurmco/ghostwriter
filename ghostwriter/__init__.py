@@ -216,6 +216,9 @@ def user_manage(userid):
 
         GET: Gets information from user with id 'userid'
         DELETE: Delete said user
+
+        Returns 404 Not Found if user not found, or 403 Forbidden
+        if trying to delete a user you are logged in
     """
     from ghostwriter.User import User, UserManager
     um = UserManager()
@@ -230,6 +233,10 @@ def user_manage(userid):
         return jsonify(jdata), 200
          
     elif request.method == 'DELETE':
+        if current_user.uid == u.uid:
+            return jsonify({'error': 
+                'Cannot delete user you are logged in'}), 403
+
         um.removeUser(u)
         return "",200
     else:
