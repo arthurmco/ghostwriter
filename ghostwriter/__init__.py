@@ -282,6 +282,11 @@ def show_users():
 def admin_create_user():
     return render_template('manage_user.html', navlink='users', action='create')
 
+@app.route('/admin/users/edit/<int:id>/', methods=['GET'])
+@login_required
+def admin_edit_user(id):
+    return render_template('manage_user.html', navlink='users', action='edit',
+            userid=id)
 
 @app.route('/admin/posts', methods=['GET'])
 @login_required

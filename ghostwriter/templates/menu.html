@@ -15,6 +15,7 @@
 				<a href="{{ url_for('do_logout') }}">Log Out</a>
 			</li>
 		</ul>
+		<div id="username"> {{ current_user.name }} </div>
 	</nav>
 	<article>
 		{% block body %}{% endblock %}

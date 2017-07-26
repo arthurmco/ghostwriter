@@ -13,9 +13,9 @@ var post_data = {};
 
 
 function run_open_user(id) {
-	var title = $("input[name=title]");
-	var content = $("textarea[name=content]");
 	var ierror = $("#error");
+	var username = $("input#username");
+	var name = $("input#name");
 
 	$.ajax({
 		cache: false,
@@ -24,9 +24,9 @@ function run_open_user(id) {
 		url: '/api/user/'+id+'/',
 		success: function(val) {
 			post_data = val;
-
-			title.prop('value', val.title);
-			run_open_content(id, content);
+			
+			username.prop('value', post_data.username);
+			name.prop('value', post_data.name);
 		},
 		statusCode: {
 			404: function() {
@@ -48,8 +48,8 @@ function run_edit_user(id) {
 	if (post_data.id < 0) 
 		return;
 	
-	var title = $("input[name=title]").prop('value');
-	var content = $("textarea[name=content]").val();
+	var username = $("input#username");
+	var name = $("input#name");
 	var ierror = $("#error");
 	
 	if (title.length <= 1) {
@@ -70,7 +70,6 @@ function run_edit_user(id) {
 		url: '/api/user/'+post_data.id+'/',
 		success: function(val) {
 			post_data = val;
-			put_content();
 		},
 		error: function(xhr, strstatus) {
 			ierror.text('An error occurred: ' + strstatus);
@@ -82,11 +81,11 @@ function run_edit_user(id) {
 function run_add_user() {
 	
 	var ierror = $("#error");
-	var isuccess = $("#error");
-	var username = $("#username").prop("value");
-	var name = $("#name").prop("value");
-	var password = $("#password").prop("value");
-	var password2 = $("#password2").prop("value");
+	var isuccess = $("#success");
+	var username = $("input#username").prop("value");
+	var name = $("input#name").prop("value");
+	var password = $("input#password").prop("value");
+	var password2 = $("input#password2").prop("value");
 
 	if (username == "" || password == "") {
 		ierror.text('Please fill username and password');
@@ -154,6 +153,12 @@ $(document).ready(function () {
 	<label for="name">Your Name: </label>
 	<input type="text" size="30" name="name" id="name" />
 	<br />
+	
+	{% if action == 'edit' %}
+	<label for="oldpassword">Type your old password: </label>
+	<input type="password" size="30" name="oldpassword" id="oldpassword" />
+	<br />	
+	{% endif %}
 
 	<label for="password">Type your password: </label>
 	<input type="password" size="30" name="password" id="password" />

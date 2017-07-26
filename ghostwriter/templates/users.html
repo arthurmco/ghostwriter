@@ -53,12 +53,15 @@ $(document).ready( function () {
 				uitem.append($("<td>"+val.id+"</td>"));
 				uitem.append($("<td>"+val.username+"</td>"));
 				uitem.append($("<td>"+val.name+"</td>"));
-				uitem.append($("<td><!--<a href='/admin/users/edit/"+val.id+"/'>Edit</a>--></td>"));
 
-				if (currid == val.id) 
+				if (currid == val.id) {
 					uitem.append($("<td></td>"));
-				else
+					uitem.append($("<td></td>"));
+				} else {
+					uitem.append($("<td><a href='/admin/users/edit/"+val.id+"/'>Edit</a></td>"));
 					uitem.append($("<td><a href='#' onClick='delete_user("+val.id+")'>Delete</a></td>"));
+				}
+
 				table.append(uitem);
 
 			});

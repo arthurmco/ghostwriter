@@ -9,7 +9,7 @@ from ghostwriter import app
 models = app.config['GHOSTWRITER_DATABASE'].database
 
 class MPost(models.Model):
-    id = models.Column(models.Integer, primary_key=True)
+    id = models.Column(models.Integer, primary_key=True, autoincrement=True)
     title = models.Column(models.String(255), unique=True)
     creation_date = models.Column(models.DateTime, unique=True)
     content = models.Column(models.Text)
@@ -24,7 +24,7 @@ class MPost(models.Model):
 
 
 class MUser(models.Model):
-    id = models.Column(models.Integer, primary_key=True)
+    id = models.Column(models.Integer, primary_key=True, autoincrement=True)
     username = models.Column(models.String(64), unique=True)
     password_hash = models.Column(models.String(512))
     name = models.Column(models.String(128))
