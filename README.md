@@ -7,7 +7,7 @@ editing and management, but don't want a predefined way to display it,
 with limited choice for themes, complicated APIs and a difficult configuration
 
 This software gives *you* the control of how the posts are shown, offering
-a simple REST API for creating and showing them, along a simple interface 
+a simple REST API for creating and showing them, along with a simple interface 
 for managing them. We don't offer a way to show them, we let you do it at
 your way.
 
@@ -31,4 +31,6 @@ You may want to run ghostwriter in a WSGI environment. Although isn't supported 
 
 The '/' route contains a test message. In the future, that message will be removable
 
-The default login is 'admin' with password 'admin'
+The default login is 'admin' with password 'admin'. 
+
+The login page is in the '/admin' entry point (usually `localhost:5000/admin` )
