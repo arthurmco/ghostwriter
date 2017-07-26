@@ -42,7 +42,7 @@ class PostArticleTestCase(unittest.TestCase):
 
     def deauthenticate(self):
         res = self.app.get('/admin/logoff', follow_redirects=True)
-        self.assertEquals(res.status,  "200 OK")  
+        self.assertEqual(res.status,  "200 OK")  
    
     def test_create_blog_post_unauthenticated(self):
         res = self.app.post('/api/post/create/',
@@ -50,7 +50,7 @@ class PostArticleTestCase(unittest.TestCase):
                     'title': "This won't work"
                 }, follow_redirects=True)
 
-        self.assertEquals(res.status,  "401 UNAUTHORIZED")
+        self.assertEqual(res.status,  "401 UNAUTHORIZED")
     
     def test_create_blog_post_authenticated(self):
         self.authenticate()
@@ -59,7 +59,7 @@ class PostArticleTestCase(unittest.TestCase):
                     'title': "This will work"
                 }, follow_redirects=True)
 
-        self.assertEquals(res.status, "200 OK")
+        self.assertEqual(res.status, "200 OK")
         self.deauthenticate()
 
     def test_create_and_read_blog_post(self):
@@ -71,7 +71,7 @@ class PostArticleTestCase(unittest.TestCase):
                     'title': "This will maybe work"
                 }, follow_redirects=True)
 
-        self.assertEquals(res.status, "200 OK")
+        self.assertEqual(res.status, "200 OK")
         create_post_data = json.loads(res.data)
 
         res = self.app.get('/api/post/'+str(create_post_data['id'])+'/',
@@ -97,7 +97,7 @@ class PostArticleTestCase(unittest.TestCase):
 
         res = self.app.get('/api/post/'+str(p.ID)+'/content',
                 follow_redirects=True)
-        self.assertEquals(res.status,  '200 OK')
+        self.assertEqual(res.status,  '200 OK')
         post_data = res.data
         self.assertEqual(b'Post content', post_data)
 
@@ -118,11 +118,11 @@ class PostArticleTestCase(unittest.TestCase):
                     'content': 'New Post content'
                 },
                 follow_redirects=True)
-        self.assertEquals(res.status,  '200 OK')
+        self.assertEqual(res.status,  '200 OK')
 
         res = self.app.get('/api/post/'+str(p.ID)+'/content',
                 follow_redirects=True)
-        self.assertEquals(res.status,  '200 OK')
+        self.assertEqual(res.status,  '200 OK')
         post_data = res.data
         self.assertEqual(b'New Post content', post_data)
         self.deauthenticate()
@@ -142,11 +142,11 @@ class PostArticleTestCase(unittest.TestCase):
                     'title': 'New Meta Test'
                 },
                 follow_redirects=True)
-        self.assertEquals(res.status,  '200 OK')
+        self.assertEqual(res.status,  '200 OK')
 
         res = self.app.get('/api/post/'+str(p.ID)+'/',
                 follow_redirects=True)
-        self.assertEquals(res.status,  '200 OK')
+        self.assertEqual(res.status,  '200 OK')
         post_data = json.loads(res.data)
         self.assertEqual('New Meta Test', post_data['title'])
         self.deauthenticate()
@@ -163,11 +163,11 @@ class PostArticleTestCase(unittest.TestCase):
 
         res = self.app.delete('/api/post/'+str(p.ID)+'/',
                 follow_redirects=True)
-        self.assertEquals(res.status,  '200 OK')
+        self.assertEqual(res.status,  '200 OK')
         
         res = self.app.delete('/api/post/'+str(p.ID)+'/',
                 follow_redirects=True)
-        self.assertEquals(res.status,  '404 NOT FOUND')
+        self.assertEqual(res.status,  '404 NOT FOUND')
         
 
 class LoginTestCase(unittest.TestCase):
@@ -198,7 +198,7 @@ class LoginTestCase(unittest.TestCase):
                 'password': self.password
             }, follow_redirects=True)
 
-        self.assertEquals(res.status,  "401 UNAUTHORIZED")  
+        self.assertEqual(res.status,  "401 UNAUTHORIZED")  
 
     def test_login_good_user_bad_pass(self):
         us = self.create_user()
@@ -208,7 +208,7 @@ class LoginTestCase(unittest.TestCase):
                 'password': 'garotoixpertinho'
             }, follow_redirects=True)
 
-        self.assertEquals(res.status,  "401 UNAUTHORIZED")  
+        self.assertEqual(res.status,  "401 UNAUTHORIZED")  
 
     def test_login(self):
         us = self.create_user()
@@ -218,7 +218,7 @@ class LoginTestCase(unittest.TestCase):
                 'password': self.password
             }, follow_redirects=True)
 
-        self.assertEquals(res.status,  "200 OK")
+        self.assertEqual(res.status,  "200 OK")
 
     def test_login_and_logoff(self):
         us = self.create_user()
@@ -228,10 +228,10 @@ class LoginTestCase(unittest.TestCase):
                 'password': self.password
             }, follow_redirects=True)
 
-        self.assertEquals(res.status,  "200 OK")  
+        self.assertEqual(res.status,  "200 OK")  
 
         res = self.app.get('/admin/logoff', follow_redirects=True)
-        self.assertEquals(res.status,  "200 OK")  
+        self.assertEqual(res.status,  "200 OK")  
         
     def test_access_unauthenticated(self):
         us = self.create_user()
@@ -241,13 +241,13 @@ class LoginTestCase(unittest.TestCase):
                 'password': self.password
             }, follow_redirects=True)
 
-        self.assertEquals(res.status, "200 OK")  
+        self.assertEqual(res.status, "200 OK")  
         res = self.app.post('/api/post/create/',
             data = {
                 'title': 'Test Post'
             }, follow_redirects=True)
 
-        self.assertEquals(res.status, "200 OK")  
+        self.assertEqual(res.status, "200 OK")  
         # TODO: check returned JSON
         
     def test_access_unauthenticated_after_logoff(self):
@@ -258,19 +258,118 @@ class LoginTestCase(unittest.TestCase):
                 'password': self.password
             }, follow_redirects=True)
 
-        self.assertEquals(res.status,  "200 OK")  
+        self.assertEqual(res.status,  "200 OK")  
         
         res = self.app.get('/admin/logoff', follow_redirects=True)
-        self.assertEquals(res.status,  "200 OK")  
+        self.assertEqual(res.status,  "200 OK")  
         
         res = self.app.post('/api/post/create/',
             data = {
                 'title': 'Test Post'
             }, follow_redirects=True)
 
-        self.assertEquals(res.status, "401 UNAUTHORIZED")  
+        self.assertEqual(res.status, "401 UNAUTHORIZED")  
+
+class UserManageTestCase(unittest.TestCase):
+    from flask import json
+
+    def setUp(self):
+        mm.setDatabaseURI('sqlite:////tmp/unittest.db')
+        mm.init()
+        mm.create()
+        self.app = app.test_client()
+        self.username = "test"
+        self.password = "test"
+        self.create_user('test', 'test')
+
+    def tearDown(self):
+        mm.drop()
+
+    def create_user(self, name, pwd):
+        from ghostwriter.User import User, UserManager
+        u = User(name)
+        umng = UserManager()
+        umng.addUser(u, pwd)
+        return u
+
+    def authenticate(self):
+        res = self.app.post('/admin/login', 
+            data = {
+                'username': self.username,
+                'password': self.password
+            }, follow_redirects=True)
+
+        self.assertEqual(res.status,  "200 OK")
+
+    def test_create_user_unauthenticated(self):
+        res = self.app.post('/api/users/', data = {
+                'username': 'teste',
+                'password': 'pasteldebacon',
+                'name': 'Teste'
+            }, follow_redirects=True)
+        self.assertEqual('401 UNAUTHORIZED', res.status)
+
+    def test_delete_user_unauthenticated(self):
+        u = self.create_user('deletenoauth', 'deletenoauth')
+        res = self.app.delete('/api/user/2/', 
+                follow_redirects=True)
+        self.assertEqual('401 UNAUTHORIZED', res.status)
+
+    def test_create_user_authenticated(self):
+        from flask import json
+        import hashlib
+        self.authenticate()
+        res = self.app.post('/api/users/', data = {
+                'username': 'teste',
+                'password': 'pasteldebacon',
+                'name': 'Teste'
+            }, follow_redirects=True)
+        self.assertEqual('200 OK', res.status)
+        user_load = json.loads(res.data)
+        
+        from ghostwriter.User import User, UserManager
+        um = UserManager()
+        u = um.getUserbyID(user_load['id'])
+        self.assertEqual(u.uid, user_load['id'])
+        self.assertEqual(u.username, user_load['username'])
+        self.assertEqual(u.name, user_load['name'])
+    
+        password_hash = hashlib.sha1(b'pasteldebacon').hexdigest()
+        self.assertIsNotNone(um.registerLogIn(u, password_hash))
+
+    def test_delete_user_authenticated(self):
+        self.authenticate()
+        u = self.create_user('deletenoauth', 'deletenoauth')
+        res = self.app.delete('/api/user/2/', 
+                follow_redirects=True)
+        self.assertEqual('200 OK', res.status)
+        
+        res = self.app.delete('/api/user/2/', 
+                follow_redirects=True)
+        self.assertEqual('404 NOT FOUND', res.status)
+
+    def test_load_user(self):
+        from flask import json
+        import hashlib
+        self.authenticate()
+        u = self.create_user('malakoi', 'devasso')
+        res = self.app.get('/api/user/2/', 
+                follow_redirects=True)
+        self.assertEqual('200 OK', res.status)
+        user_load = json.loads(res.data)
+        
+        from ghostwriter.User import User, UserManager
+        um = UserManager()
+        u = um.getUserbyID(user_load['id'])
+        self.assertEqual(u.uid, user_load['id'])
+        self.assertEqual(u.username, user_load['username'])
+        self.assertEqual(u.name, user_load['name'])
+        
+        password_hash = hashlib.sha1(b'devasso').hexdigest()
+        self.assertIsNotNone(um.registerLogIn(u, password_hash))
 
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)
+
 

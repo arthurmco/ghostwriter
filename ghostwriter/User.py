@@ -99,6 +99,27 @@ class UserManager():
 
         return us
 
+    def getAllUsers(self, start=0, end=None):
+        """ Get all posts by IDorder, from start to start+end.
+            If none found, return empty list
+        """
+        from ghostwriter.models.models import MUser
+        us = []
+
+        muq = MUser.query.order_by(MPost.id).offset(start)
+        if not (end is None):
+            muq = muq.limit(end)
+
+        mu = muq.all()
+        if mu is None:
+            return []
+        
+        for muitem in mu:
+            u = User(mu.username, mu.name)
+            u._id = mu.id
+            us.append(u)
+
+        return us
 
     def getUserbyID(self, uid):
         from ghostwriter.models.models import MUser
@@ -114,7 +135,7 @@ class UserManager():
         from ghostwriter.models.models import MUser
         mus = MUser.query.all()
         if mus is None:
-            return None
+            return []
 
         us = []
         for mu in mus:
@@ -124,6 +145,22 @@ class UserManager():
 
         return us
 
+    def removeUser(self, user):
+        """ Remove an user.
+            Return false if user doesn't exist
+        """
+        from ghostwriter.models.models import MUser, models
+        if user.uid < 0:
+            return False
+
+        mu = MUser.query.get(user.uid)
+        if mu is None:
+            return False
+
+        models.session.delete(mu)
+        models.session.commit()
+        user._id = -1
+        return True
 
     def getUserbyUsername(self, uname):
         from ghostwriter.models.models import MUser

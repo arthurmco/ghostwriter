@@ -169,4 +169,5 @@ class PostManager(object):
         models.session.delete(mp)
         models.session.commit()
         post._id = -1
+        return True
 

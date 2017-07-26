@@ -157,6 +157,84 @@ def post_create():
     return jsonify(jdata), 200
 
 
+@app.route('/api/users/', methods=['GET', 'POST'])
+@login_required
+def user_list_manage():
+    """
+        Manages users
+
+        GET: Gets all users
+        POST: Creates an user
+            username: login name
+            password: the password
+            name: the user true name. Optional
+
+        Return an 200 OK if all OK
+    """
+    from ghostwriter.User import User, UserManager
+    um = UserManager()
+
+    if request.method == 'GET':
+        userlist = um.getAllUsers()
+        if len(userlist) <= 0:
+            return jsonify({'error': 'No users'}), 404
+
+        juser = []
+
+        for user in userlist:
+            jdata = {'id': user.uid,
+                     'username': user.username,
+                     'name': user.name}
+            juser.append(jdata)
+
+        return jsonify(juser), 200
+
+
+    elif request.method == 'POST':
+        login = request.form['username']
+        password = request.form['password']
+
+        try:
+            name = request.form['name']
+        except KeyError:
+            name = login
+
+        user = User(login, name) 
+        um.addUser(user, password)
+        jdata = {'id': user.uid,
+                 'username': user.username,
+                 'name': user.name}
+        return jsonify(jdata),200
+    else:
+        return "",405
+
+@app.route('/api/user/<int:userid>/', methods=['GET','DELETE'])
+@login_required
+def user_manage(userid):
+    """
+        Manages an individual user
+
+        GET: Gets information from user with id 'userid'
+        DELETE: Delete said user
+    """
+    from ghostwriter.User import User, UserManager
+    um = UserManager()
+    u = um.getUserbyID(userid)
+    if u is None:
+        return jsonify({'error': 'User not found'}), 404
+
+    if request.method == 'GET':
+        jdata = {'id': u.uid,
+                 'username': u.username,
+                 'name': u.name}
+        return jsonify(jdata), 200
+         
+    elif request.method == 'DELETE':
+        um.removeUser(u)
+        return "",200
+    else:
+        return "",405
+    
 # Admin interface
 @app.route('/admin')
 def show_admin_panel():
