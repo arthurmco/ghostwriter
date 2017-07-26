@@ -38,7 +38,8 @@ function delete_post(postid) {
 }
 
 $(document).ready( function () {
-	var table = $("#posts_table");
+	var table = $("#posts_table tbody");
+	table.empty();
 
 	$.ajax({
 		cache: false,
@@ -59,12 +60,14 @@ $(document).ready( function () {
 		},
 		statusCode: {
 			404: function() {
+				table.empty();
 				table.append("<tr><td colspan='4'>"+
 					"No posts found</td></tr>");
 				return;					
 			}
 		},
 		error: function(xhr, strstatus) {
+			table.empty();
 			table.append("<tr><td colspan='4'>"+
 				"An error occurred</td></tr>");
 			return;					
@@ -77,6 +80,7 @@ $(document).ready( function () {
 
 
 <table id="posts_table">
+	<thead>
 	<tr>
 		<th>ID</th>
 		<th>Title</th>
@@ -84,6 +88,8 @@ $(document).ready( function () {
 		<th><!-- Edit --></th>
 		<th><!-- Delete --></th>
 	</tr>
+	</thead>
+	<tbody />
 </table>
 
 
