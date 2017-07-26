@@ -1,0 +1,172 @@
+{% extends "menu.html" %}
+{% block title %} Ghostwriter - Add User {% endblock %}
+
+{% block body %}
+
+<h1>Create User</h1>
+
+<div id="error"> </div>
+<div id="success"> </div>
+<script type="text/javascript">
+
+var post_data = {};
+
+
+function run_open_user(id) {
+	var title = $("input[name=title]");
+	var content = $("textarea[name=content]");
+	var ierror = $("#error");
+
+	$.ajax({
+		cache: false,
+		method: 'GET',
+		dataType: 'json',
+		url: '/api/user/'+id+'/',
+		success: function(val) {
+			post_data = val;
+
+			title.prop('value', val.title);
+			run_open_content(id, content);
+		},
+		statusCode: {
+			404: function() {
+				ierror.text('The post could not be found');
+				title.prop('disabled', 'disabled');
+				content.prop('disabled', 'disabled');
+			}
+		},
+		error: function(xhr, strstatus) {
+			ierror.text('An error occurred while opening');
+			return;
+		}
+	});
+
+
+}
+
+function run_edit_user(id) {
+	if (post_data.id < 0) 
+		return;
+	
+	var title = $("input[name=title]").prop('value');
+	var content = $("textarea[name=content]").val();
+	var ierror = $("#error");
+	
+	if (title.length <= 1) {
+		ierror.text('Please type a title');
+		return;
+	}
+
+	if (content.length <= 1) {
+		ierror.text('Please type something in content');
+		return;
+	}
+
+	$.ajax({
+		cache: false,
+		data: 'title='+title,
+		method: 'PUT',
+		dataType: 'json',
+		url: '/api/user/'+post_data.id+'/',
+		success: function(val) {
+			post_data = val;
+			put_content();
+		},
+		error: function(xhr, strstatus) {
+			ierror.text('An error occurred: ' + strstatus);
+			return;
+		}
+	});
+}
+
+function run_add_user() {
+	
+	var ierror = $("#error");
+	var isuccess = $("#error");
+	var username = $("#username").prop("value");
+	var name = $("#name").prop("value");
+	var password = $("#password").prop("value");
+	var password2 = $("#password2").prop("value");
+
+	if (username == "" || password == "") {
+		ierror.text('Please fill username and password');
+		return;
+	}
+
+	if (password != password2) {
+		ierror.text('Passwords are different');
+		return;
+	}
+ 
+	if (password == username) { 
+		ierror.text('Password and username cannot be the same');
+		return;
+	}
+
+	if (password.length <= 4) {
+		ierror.text('Password is too short');
+		return;
+	}
+
+	if (username.length <= 2) {
+		ierror.text('Username is too short');
+		return;
+	}
+	
+	var fd = new FormData();
+	fd.append('username', username);
+	fd.append('password', password);
+	if (name.length >= 2)
+		fd.append('name', name);
+
+	$.ajax({
+		cache: false,
+		data: fd,
+		contentType: false,
+		processData: false,
+		method: 'POST',
+		dataType: 'json',
+		url: '{{ url_for("user_list_manage") }}',
+		success: function(val) {
+			post_data = val;
+			isuccess.text('User added successfully!');
+		},
+		error: function(xhr, strstatus) {
+			ierror.text('An error occurred: ' + strstatus);
+			return;
+		}
+	});
+}
+
+$(document).ready(function () {
+	{% if action == 'edit'%}
+	run_open_user({{ userid }});
+	{% endif %}
+});
+
+</script>
+
+<form action="#" method="post">
+	<label for="username">Username: </label>
+	<input type="text" size="10" name="username" id="username" />
+	<br />
+
+	<label for="name">Your Name: </label>
+	<input type="text" size="30" name="name" id="name" />
+	<br />
+
+	<label for="password">Type your password: </label>
+	<input type="password" size="30" name="password" id="password" />
+	<br />
+	
+	<label for="password2">Type your password: </label>
+	<input type="password" size="30" name="password2" id="password2" />
+	<br />
+	
+	<hr />
+	<input type="button" id="btnAdd" value="Add" onClick="run_add_user()" style="{{ 'visibility: hidden;' if not (action == 'create') }}" />
+	<input type="button" id="btnEdit" value="Edit" onClick="run_edit_user()" style="{{ 'visibility: hidden;' if not (action == 'edit') }}" />
+</form>
+
+
+{% endblock %}

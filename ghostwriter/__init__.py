@@ -277,6 +277,12 @@ def show_main_admin():
 def show_users():
     return render_template('users.html', navlink='users')
 
+@app.route('/admin/users/create', methods=['GET'])
+@login_required
+def admin_create_user():
+    return render_template('manage_user.html', navlink='users', action='create')
+
+
 @app.route('/admin/posts', methods=['GET'])
 @login_required
 def show_posts():
