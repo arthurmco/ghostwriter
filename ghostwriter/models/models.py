@@ -15,7 +15,8 @@ class MPost(models.Model):
     content = models.Column(models.Text)
     user_id = models.Column(models.Integer, models.ForeignKey('m_user.id'))
 
-    def __init__(self, title, creation_date, content=""):
+    def __init__(self, user_id, title, creation_date, content=""):
+        self.user_id = user_id
         self.title = title
         self.creation_date = creation_date
         self.content = content

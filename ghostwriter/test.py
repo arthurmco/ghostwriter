@@ -24,7 +24,8 @@ class PostArticleTestCase(unittest.TestCase):
         mm.drop()
 
     def create_user(self):
-        from ghostwriter.User import User, UserManager
+        from ghostwriter.User import User
+        from ghostwriter.UserManager import UserManager
         self.username = 'malakoi'
         self.password = 'dandoboura'
         u = User(self.username)
@@ -82,6 +83,8 @@ class PostArticleTestCase(unittest.TestCase):
         self.assertEqual(get_post_data['title'], create_post_data['title'])
         self.assertEqual(get_post_data['creation_date'], create_post_data['creation_date'])
         self.assertEqual(get_post_data['summary'], create_post_data['summary'])
+        self.assertEqual(1, get_post_data['owner']['id'])
+        self.assertEqual(self.username, get_post_data['owner']['name'])
 
         self.deauthenticate()
 
@@ -90,7 +93,7 @@ class PostArticleTestCase(unittest.TestCase):
         from ghostwriter.Post import Post, PostManager
         from flask import json
         
-        p = Post('Get Content Test')
+        p = Post(1, 'Get Content Test')
         p.setContent('Post content')
         pm = PostManager()
         pm.addPost(p)
@@ -108,7 +111,7 @@ class PostArticleTestCase(unittest.TestCase):
         from ghostwriter.Post import Post, PostManager
         from flask import json
         
-        p = Post('Get Content Test')
+        p = Post(1, 'Get Content Test')
         p.setContent('Post content')
         pm = PostManager()
         pm.addPost(p)
@@ -132,7 +135,7 @@ class PostArticleTestCase(unittest.TestCase):
         from ghostwriter.Post import Post, PostManager
         from flask import json
         
-        p = Post('Get Meta Test')
+        p = Post(1, 'Get Meta Test')
         p.setContent('Post content')
         pm = PostManager()
         pm.addPost(p)
@@ -156,7 +159,7 @@ class PostArticleTestCase(unittest.TestCase):
         from ghostwriter.Post import Post, PostManager
         from flask import json
         
-        p = Post('Get Content Test')
+        p = Post(1, 'Get Content Test')
         p.setContent('Post content')
         pm = PostManager()
         pm.addPost(p)
@@ -179,7 +182,8 @@ class LoginTestCase(unittest.TestCase):
         self.password = ""
 
     def create_user(self):
-        from ghostwriter.User import User, UserManager
+        from ghostwriter.User import User
+        from ghostwriter.UserManager import UserManager
         self.username = 'malakoi'
         self.password = 'dandoboura'
         u = User(self.username)
@@ -286,7 +290,8 @@ class UserManageTestCase(unittest.TestCase):
         mm.drop()
 
     def create_user(self, name, pwd):
-        from ghostwriter.User import User, UserManager
+        from ghostwriter.User import User
+        from ghostwriter.UserManager import UserManager
         u = User(name)
         umng = UserManager()
         umng.addUser(u, pwd)
@@ -327,7 +332,8 @@ class UserManageTestCase(unittest.TestCase):
         self.assertEqual('200 OK', res.status)
         user_load = json.loads(res.data)
         
-        from ghostwriter.User import User, UserManager
+        from ghostwriter.User import User
+        from ghostwriter.UserManager import UserManager
         um = UserManager()
         u = um.getUserbyID(user_load['id'])
         self.assertEqual(u.uid, user_load['id'])
@@ -358,7 +364,8 @@ class UserManageTestCase(unittest.TestCase):
         self.assertEqual('200 OK', res.status)
         user_load = json.loads(res.data)
         
-        from ghostwriter.User import User, UserManager
+        from ghostwriter.User import User
+        from ghostwriter.UserManager import UserManager
         um = UserManager()
         u = um.getUserbyID(user_load['id'])
         self.assertEqual(u.uid, user_load['id'])
@@ -370,7 +377,8 @@ class UserManageTestCase(unittest.TestCase):
 
     def test_update_user(self):
         from flask import json
-        from ghostwriter.User import User, UserManager
+        from ghostwriter.User import User
+        from ghostwriter.UserManager import UserManager
 
         self.authenticate()
         u = self.create_user('malakoi', 'devasso')

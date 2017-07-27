@@ -16,7 +16,7 @@ login_manager.init_app(app)
 
 @login_manager.user_loader
 def load_user(session_id):
-    from ghostwriter.User import UserManager, get_user_manager
+    from ghostwriter.UserManager import UserManager, get_user_manager
     um = get_user_manager()
   
     session_parts = str(session_id).split('|')
@@ -60,7 +60,12 @@ def posts_get():
                  'id': post.ID,
                  'title': post.title,
                  'creation_date': post.creation_date.isoformat(),
-                 'summary': post.getSummary()
+                 'summary': post.getSummary(),
+                 'owner': {
+                     'id': post.getOwner().uid,
+                     'name': post.getOwner().name
+                 }
+
              }
         post_arr.append(post_val)
         
@@ -118,7 +123,11 @@ def post_get(id):
         jdata = {   'id': post.ID,
                  'title': post.title,
                  'creation_date': post.creation_date.isoformat(),
-                 'summary': post.getSummary()
+                 'summary': post.getSummary(),
+                 'owner': {
+                     'id': post.getOwner().uid,
+                     'name': post.getOwner().name
+                 }
              }
         return jsonify(jdata), 200
     elif request.method == 'DELETE':
@@ -131,7 +140,12 @@ def post_get(id):
         jdata = {   'id': post.ID,
                  'title': post.title,
                  'creation_date': post.creation_date.isoformat(),
-                 'summary': post.getSummary()
+                 'summary': post.getSummary(),
+                 'owner': {
+                     'id': post.getOwner().uid,
+                     'name': post.getOwner().name
+                 }
+
              }
         return jsonify(jdata), 200
     else:
@@ -147,12 +161,17 @@ def post_create():
     from ghostwriter.Post import Post, PostManager
     pm = PostManager()
 
-    post = Post(request.form['title'])
+    post = Post(current_user.uid, request.form['title'])
     pm.addPost(post)
     jdata = {   'id': post.ID,
                 'title': post.title,
                 'creation_date': post.creation_date.isoformat(),
-                'summary': post.getSummary()
+                'summary': post.getSummary(),
+                 'owner': {
+                     'id': post.getOwner().uid,
+                     'name': post.getOwner().name
+                 }
+
             }
     return jsonify(jdata), 200
 
@@ -171,7 +190,8 @@ def user_list_manage():
 
         Return an 200 OK if all OK
     """
-    from ghostwriter.User import User, UserManager
+    from ghostwriter.User import User
+    from ghostwriter.UserManager import UserManager
     um = UserManager()
 
     if request.method == 'GET':
@@ -221,7 +241,8 @@ def user_manage(userid):
         Returns 404 Not Found if user not found, or 403 Forbidden
         if trying to delete a user you are logged in
     """
-    from ghostwriter.User import User, UserManager
+    from ghostwriter.User import User
+    from ghostwriter.UserManager import UserManager
     um = UserManager()
     u = um.getUserbyID(userid)
     if u is None:
@@ -261,15 +282,16 @@ def do_login():
     username = request.form['username']
     password = request.form['password']
 
-    from ghostwriter.User import User, UserManager
-    um = UserManager()
+    from ghostwriter.User import User
+    from ghostwriter.UserManager import UserManager, get_user_manager
+    um = get_user_manager()
     u = um.getUserbyUsername(username)
 
     if u is None:
         flash('User does not exist')
         return render_template('admin.html'), 401
 
-    if not u.login(password):
+    if not u.login(password, um):
         flash('Invalid user or password')
         return render_template('admin.html'), 401
 
@@ -329,7 +351,8 @@ def initdb():
     app.logger.info('Creating database')
     try:
         mm.create()
-        from ghostwriter.User import User, UserManager
+        from ghostwriter.User import User
+        from ghostwriter.UserManager import UserManager
         um = UserManager()
         um.addUser(User('admin', 'Administrator'), 'admin')
 

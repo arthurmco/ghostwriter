@@ -6,10 +6,11 @@
 from datetime import datetime
 
 class Post(object):
-    def __init__(self, title, creation_date=None):
+    def __init__(self, ownerid, title, creation_date=None):
         self._title = title
         if creation_date is None:
             creation_date = datetime.utcnow()
+        self._ownerid = ownerid
         self._creation_date = creation_date
         self._id = -1
         self._content = ""
@@ -65,6 +66,11 @@ class Post(object):
     def ID(self):
         return self._id
 
+    def getOwner(self):
+        from ghostwriter.UserManager import get_user_manager, UserManager
+        return get_user_manager().getUserbyID(self._ownerid)
+
+
 from ghostwriter.models.models import MPost
 
 class PostManager(object):
@@ -74,7 +80,7 @@ class PostManager(object):
         if mp is None:
             return None
 
-        post = Post(mp.title, mp.creation_date)
+        post = Post(mp.user_id, mp.title, mp.creation_date)
         post._id = mp.id
         post.setContent(mp.content)
         return post
@@ -89,7 +95,7 @@ class PostManager(object):
 
         posts = []
         for mpitem in mp:
-            post = Post(mp.title, mp.creation_date)
+            post = Post(mp.user_id, mp.title, mp.creation_date)
             post._id = mp.id
             post.setContent(mp.content)
             posts.append(post)
@@ -113,7 +119,7 @@ class PostManager(object):
         
         posts = []
         for mpitem in mp:
-            post = Post(mpitem.title, mpitem.creation_date)
+            post = Post(mpitem.user_id, mpitem.title, mpitem.creation_date)
             post._id = mpitem.id
             post.setContent(mpitem.content)
             posts.append(post)
@@ -123,7 +129,7 @@ class PostManager(object):
     def addPost(self, post):
         """ Adds a post """
         from ghostwriter.models.models import models
-        mp = MPost(post.title, post.creation_date, post.getContent())
+        mp = MPost(post.getOwner().uid, post.title, post.creation_date, post.getContent())
         models.session.add(mp)
         models.session.commit()
         post._id = mp.id
