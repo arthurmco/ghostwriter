@@ -8,7 +8,7 @@ body {
 form {
 	position: relative;
 	left: 1px;
-	top: 1px;
+	top: 10px;
 	width: 95%;
 }
 }
@@ -33,4 +33,9 @@ footer {
 	position: relative;
 	left: 30%;
 	font-size: 11pt;
+}
+
+#error {
+	color: red;
+	border-bottom: 1px solid #aa0000;
 }

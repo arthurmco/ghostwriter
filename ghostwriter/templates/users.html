@@ -87,8 +87,9 @@ $(document).ready( function () {
 });
 
 </script>
+<p><a href="{{ url_for('admin_create_user') }}">Create User</a></p>
 
-<table id="users_table" >
+<table id="users_table" class="table table-condensed" >
 	<thead>
 	<tr>
 		<th>ID</th>
@@ -99,7 +100,6 @@ $(document).ready( function () {
 	<tbody />
 </table>
 
-<a href="{{ url_for('admin_create_user') }}">Create User</a>
 
 
 {% endblock %}

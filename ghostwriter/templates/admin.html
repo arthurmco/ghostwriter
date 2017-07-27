@@ -2,12 +2,14 @@
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>Ghostwriter - Admin Panel </title>
 
 	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='admin.css') }}" />
 </head>
 <body>
 	<form action="{{ url_for('do_login') }}" method="post">
+	<hr/>
 		{% with message = get_flashed_messages() %}
 		{% if message %}
 		<div id="error">

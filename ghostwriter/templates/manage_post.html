@@ -165,12 +165,13 @@ $(document).ready(function () {
 
 </script>
 
-<form action="#" method="post">
-	<input type="text" name="title" size="70" placeholder="Title" /><br/>
-	<textarea rows="20" name="content" cols="75" placeholder="Content"> </textarea><br/>
-	<hr />
-	<input type="button" id="btnAdd" value="Add" onClick="run_add_post()" style="{{ 'visibility: hidden;' if not (action == 'create') }}" />
-	<input type="button" id="btnEdit" value="Update" onClick="run_edit_post()" style="{{ 'visibility: hidden;' if not (action == 'edit') }}" />
+<form action="#" method="post" class="row">
+	<div class="col-sm-10 col-sm-offset-1">
+	<input class="form-control" type="text" name="title" size="70" placeholder="Title" />
+	<textarea class="form-control" rows="20" name="content" cols="75" placeholder="Content"> </textarea>
+	<input class="btn btn-info" type="button" id="btnAdd" value="Add" onClick="run_add_post()" style="{{ 'visibility: hidden;' if not (action == 'create') }}" />
+	<input class="btn btn-info" type="button" id="btnEdit" value="Update" onClick="run_edit_post()" style="{{ 'visibility: hidden;' if not (action == 'edit') }}" />
+	</div>
 </form>
 
 
