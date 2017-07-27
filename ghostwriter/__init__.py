@@ -208,7 +208,7 @@ def user_list_manage():
     else:
         return "",405
 
-@app.route('/api/user/<int:userid>/', methods=['GET','DELETE'])
+@app.route('/api/user/<int:userid>/', methods=['GET','DELETE', 'PUT'])
 @login_required
 def user_manage(userid):
     """
@@ -216,6 +216,7 @@ def user_manage(userid):
 
         GET: Gets information from user with id 'userid'
         DELETE: Delete said user
+        PUT: Update user information, unless password
 
         Returns 404 Not Found if user not found, or 403 Forbidden
         if trying to delete a user you are logged in
@@ -231,7 +232,15 @@ def user_manage(userid):
                  'username': u.username,
                  'name': u.name}
         return jsonify(jdata), 200
-         
+    elif request.method == "PUT":
+        u.username = request.form['username']
+        u.name = request.form['name']
+        um.updateUser(u)
+        jdata = {'id': u.uid,
+                 'username': u.username,
+                 'name': u.name}
+        return jsonify(jdata), 200
+
     elif request.method == 'DELETE':
         if current_user.uid == u.uid:
             return jsonify({'error': 

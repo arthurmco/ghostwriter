@@ -48,28 +48,38 @@ function run_edit_user(id) {
 	if (post_data.id < 0) 
 		return;
 	
-	var username = $("input#username");
-	var name = $("input#name");
+	var username = $("input#username").prop('value');
+	var name = $("input#name").prop('value');
 	var ierror = $("#error");
+	var imsg = $("#success");
 	
-	if (title.length <= 1) {
-		ierror.text('Please type a title');
+	if (username.length <= 1) {
+		ierror.text('Please type the login/username');
 		return;
 	}
 
-	if (content.length <= 1) {
-		ierror.text('Please type something in content');
+	if (name.length <= 1) {
+		ierror.text('Please type the wished name');
 		return;
 	}
+
+
+	var fd = new FormData();
+	fd.append('username', username);
+	fd.append('name', name);
 
 	$.ajax({
 		cache: false,
-		data: 'title='+title,
+		data: fd,
+		contentType: false,
+		processData: false,
 		method: 'PUT',
 		dataType: 'json',
 		url: '/api/user/'+post_data.id+'/',
 		success: function(val) {
-			post_data = val;
+			post_data.name = val.name;
+			post_data.username = val.username;
+			imsg.text("User updated successfully");
 		},
 		error: function(xhr, strstatus) {
 			ierror.text('An error occurred: ' + strstatus);
@@ -170,7 +180,7 @@ $(document).ready(function () {
 	
 	<hr />
 	<input type="button" id="btnAdd" value="Add" onClick="run_add_user()" style="{{ 'visibility: hidden;' if not (action == 'create') }}" />
-	<input type="button" id="btnEdit" value="Edit" onClick="run_edit_user()" style="{{ 'visibility: hidden;' if not (action == 'edit') }}" />
+	<input type="button" id="btnEdit" value="Update" onClick="run_edit_user()" style="{{ 'visibility: hidden;' if not (action == 'edit') }}" />
 </form>
 
 

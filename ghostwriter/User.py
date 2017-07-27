@@ -59,10 +59,17 @@ class User(object):
     def username(self):
         return self._username
 
+    @username.setter
+    def username(self, value):
+        self._username = value
+
     @property
     def name(self):
         return self._name
 
+    @name.setter
+    def name(self, val):
+        self._name = val
 
     def __repr__(self):
         return '<User {}, is_auth={}, session_token={}, name={} id={}>'.format(
@@ -98,6 +105,17 @@ class UserManager():
             return None
 
         return us
+
+    def updateUser(self, user):
+        from ghostwriter.models.models import MUser, models
+        mus = MUser.query.get(user.uid)
+        if mus is None:
+            return False
+
+        mus.username = user.username
+        mus.name = user.name
+        models.session.commit()
+        return True        
 
     def getAllUsers(self, start=0, end=None):
         """ Get all posts by IDorder, from start to start+end.

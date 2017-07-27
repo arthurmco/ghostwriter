@@ -368,6 +368,22 @@ class UserManageTestCase(unittest.TestCase):
         password_hash = hashlib.sha1(b'devasso').hexdigest()
         self.assertIsNotNone(um.registerLogIn(u, password_hash))
 
+    def test_update_user(self):
+        from flask import json
+        from ghostwriter.User import User, UserManager
+
+        self.authenticate()
+        u = self.create_user('malakoi', 'devasso')
+        res = self.app.put('/api/user/2/', data = {
+                'name': 'Ixpertinho', 
+                'username': 'garoto'
+            }, follow_redirects=True)
+        self.assertEqual('200 OK', res.status)
+
+        um = UserManager()
+        u = um.getUserbyID(2)
+        self.assertEqual('Ixpertinho', u.name)
+        self.assertEqual('garoto', u.username)
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)
