@@ -6,9 +6,10 @@ from flask_login import LoginManager, login_user, logout_user, current_user, log
 from ghostwriter.models.modelmanager import ModelManager
 
 app = Flask("ghostwriter");
+app.config.from_envvar('GHOSTWRITER_CONFIG')
 
 mm = ModelManager(app)
-mm.setDatabaseURI('sqlite:////tmp/test.db')
+mm.setDatabaseURI(app.config['GHOSTWRITER_DATABASE'])
 mm.init()
 
 login_manager = LoginManager()

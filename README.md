@@ -23,6 +23,7 @@ This software is licensed under the MIT License
  - Clone this repository
  - Create a virtualenv and enter it
  - Run `pip install -e . `
+ - Set the `GHOSTWRITER_CONFIG` environment variable to a configuration file. See 'Configuration' for more details
  - Run `FLASK_APP=ghostwriter flask initdb`. This will create the database and 
    the needed tables
 
@@ -37,3 +38,11 @@ The '/' route contains a test message. In the future, that message will be remov
 The default login is 'admin' with password 'admin'. 
 
 The login page is in the '/admin' entry point (usually `localhost:5000/admin` )
+
+## Configuration
+
+You can configure Ghostwriter options through a configuration file. 
+
+A sample named ghostwriter.cfg is located in the project folder, but it's name is controlled by the envvar `GHOSTWRITER_CONFIG`, and it's relative to the ghostwriter folder in this package. Recognized options are:
+
+ - `GHOSTWRITER_DATABASE`: The database connection string
