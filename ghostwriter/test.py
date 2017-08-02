@@ -6,11 +6,14 @@
 
 import unittest
 from ghostwriter import app, mm
-from ghtest import *
-
+from ghostwriter.ghtest import *
 
 if __name__ == '__main__':
-    testsuite = unittest.TestLoader().discover('./ghtest')
+    try:
+        testsuite = unittest.TestLoader().discover('./ghostwriter/ghtest')
+    except:
+        testsuite = unittest.TestLoader().discover('./ghtest')
+
     unittest.TextTestRunner(verbosity=2).run(testsuite)
 
 

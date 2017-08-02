@@ -164,10 +164,137 @@ class PostArticleTestCase(unittest.TestCase):
 
         res = self.app.delete('/api/post/'+str(p.ID)+'/',
                 follow_redirects=True)
-        self.assertEqual(res.status,  '200 OK')
-        
+        self.assertEqual(res.status,  '200 OK')        
         res = self.app.delete('/api/post/'+str(p.ID)+'/',
                 follow_redirects=True)
         self.assertEqual(res.status,  '404 NOT FOUND')
 
 
+class PostSearchTestCase(unittest.TestCase):
+    from flask import json
+
+    def setUp(self):
+        mm.setDatabaseURI('sqlite:////tmp/unittest.db')
+        mm.init()
+        mm.create()
+        self.app = app.test_client()
+        self.user = self.create_user('test', 'test')
+
+    def tearDown(self):
+        mm.drop()
+
+    def create_user(self, username, password):
+        from ghostwriter.User import User
+        from ghostwriter.UserManager import UserManager
+        u = User(username)
+        umng = UserManager()
+        umng.addUser(u, password)       
+        return u
+
+    def create_post(self, title, body, author, cdate=None):
+        from ghostwriter.Post import Post, PostManager
+        
+        po = Post(author.uid, title, cdate)
+        po.setContent(body)
+
+        pm = PostManager()
+        pm.addPost(po)
+
+    def test_searchbyTitle(self):
+        self.create_post("Search One", "Post Search One", self.user)
+        self.create_post("Normal One", "Post Normal One", self.user)
+        self.create_post("Search Two", "Post Search Two", self.user)
+        self.create_post("Normal Two", "Post Normal Two", self.user)
+        self.create_post("Search THree", "Post Search Three", self.user)
+        self.create_post("Normal Three", "Post Normal Three", self.user)
+        self.create_post("What is this", "Post different", self.user)
+
+        res = self.app.get('/api/post/search',
+                data = {
+                        'title': 'Search'
+                }, follow_redirects=True)
+
+        self.assertEqual(res.status,  '200 OK')
+        post_data = json.loads(res.data)
+        self.assertEqual(3, len(post_data))
+
+    def test_searchbyAuthor(self):
+        other = self.create_user('other', 'other')
+        self.create_post("Search One", "Post Search One", self.user)
+        self.create_post("Normal One", "Post Normal One", self.user)
+        self.create_post("Search Two", "Post Search Two", other)
+        self.create_post("Normal Two", "Post Normal Two", other)
+        self.create_post("Search THree", "Post Search Three", other)
+        self.create_post("Normal Three", "Post Normal Three", other)
+        self.create_post("What is this", "Post different", self.user)
+
+        res = self.app.get('/api/user/1/posts', follow_redirects=True)
+
+        self.assertEqual(res.status,  '200 OK')
+        post_data = json.loads(res.data)
+        self.assertEqual(3, len(post_data))
+
+    def test_searchbyDate(self):
+        from datetime import datetime
+        self.create_post("Search One", "Post Search One", self.user, 
+                datetime(2017, 7, 1))
+        self.create_post("Normal One", "Post Normal One", self.user)
+        self.create_post("Search Two", "Post Search Two", self.user,
+                datetime(2017, 7, 1))
+        self.create_post("Normal Two", "Post Normal Two", self.user)
+        self.create_post("Search THree", "Post Search Three", self.user,
+                datetime(2017, 7, 1))
+        self.create_post("Normal Three", "Post Normal Three", self.user)
+        self.create_post("What is this", "Post different", self.user,
+                datetime(2017, 7, 1))
+
+        res = self.app.get('/api/post/search', 
+                data = {
+                    'cdate': '2017-7-1',
+                }, follow_redirects=True)
+
+        self.assertEqual(res.status,  '200 OK')
+        post_data = json.loads(res.data)
+        self.assertEqual(4, len(post_data))
+
+    def test_searchbyTitleandAuthor(self):
+        other = self.create_user('other', 'other')
+        self.create_post("Search One", "Post Search One", self.user)
+        self.create_post("Normal One", "Post Normal One", self.user)
+        self.create_post("Search Two", "Post Search Two", other)
+        self.create_post("Normal Two", "Post Normal Two", other)
+        self.create_post("Search THree", "Post Search Three", self.user)
+        self.create_post("Normal Three", "Post Normal Three", other)
+        self.create_post("What is this", "Post different", self.user)
+
+        res = self.app.get('/api/user/1/posts/search', 
+                data = {
+                    'title': 'Search',
+                }, follow_redirects=True)
+
+        self.assertEqual(res.status,  '200 OK')
+        post_data = json.loads(res.data)
+        self.assertEqual(2, len(post_data))
+
+    def test_searchbyDateandAuthor(self):
+        from datetime import datetime
+        self.create_post("Search One", "Post Search One", self.other, 
+                datetime(2017, 7, 1))
+        self.create_post("Normal One", "Post Normal One", self.other)
+        self.create_post("Search Two", "Post Search Two", self.user,
+                datetime(2017, 7, 1))
+        self.create_post("Normal Two", "Post Normal Two", self.other)
+        self.create_post("Search THree", "Post Search Three", self.user,
+                datetime(2017, 7, 1))
+        self.create_post("Normal Three", "Post Normal Three", self.other)
+        self.create_post("What is this", "Post different", self.user,
+                datetime(2017, 7, 1))
+
+        res = self.app.get('/api/user/1/posts/search', 
+                data = {
+                    'cdate': '2017-7-1',
+                }, follow_redirects=True)
+
+        self.assertEqual(res.status,  '200 OK')
+        post_data = json.loads(res.data)
+        self.assertEqual(2, len(post_data))
