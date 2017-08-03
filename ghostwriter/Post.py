@@ -33,18 +33,22 @@ class Post(object):
         """ Retrieve a short description of the blog, extracted from
             the content
 
-            Preferably find a dot to end the summary, or end it with an
-            ellipsis
+            Preferably find a dot or newline to end the summary, 
+            or end it with an ellipsis
         """
         summary = self._content[:128]
         if len(summary) < 128:
             return summary
         
         ldot = summary.rfind('.')
-        if ldot < 0:
-            return summary + '...'
-        else:
+        if ldot > 0:
             return summary[:ldot]
+
+        lnl = summary.rfind('\n')
+        if lnl > 0:
+            return summary[:lnl]
+
+        return summary + '...'
 
     @property 
     def title(self):
