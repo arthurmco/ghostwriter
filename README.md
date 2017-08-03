@@ -1,7 +1,8 @@
 # Ghostwriter
 
 [![travis-badge](https://api.travis-ci.org/arthurmco/ghostwriter.svg?branch=master)](https://travis-ci.org/arthurmco/ghostwriter)
-        
+[![Coverage Status](https://coveralls.io/repos/github/arthurmco/ghostwriter/badge.svg?branch=master)](https://coveralls.io/github/arthurmco/ghostwriter?branch=master)
+
 Ghostwriter is a software for those that want a platform for article/blog 
 editing and management, but don't want a predefined way to display it, 
 with limited choice for themes (that never fit with your site), complicated
