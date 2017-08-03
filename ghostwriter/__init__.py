@@ -40,20 +40,8 @@ def test_run():
         Please disable this route in the setup (not existent yet) """
 
 
-# REST interfaces
-@app.route('/api/posts/', methods=['GET'])
-def posts_get():
-    """
-        Gets all posts
-
-        Returns a JSON with their information, without content data
-    """
-    from ghostwriter.Post import Post, PostManager 
-    pm = PostManager()
-    posts = pm.getAllPosts()
-    if len(posts) <= 0:
-        return jsonify({'error': 'No posts found'}), 404
-
+def post_array_to_dictionary(posts):
+    from ghostwriter.Post import Post
     post_arr = []
 
     for post in posts:
@@ -69,9 +57,52 @@ def posts_get():
 
              }
         post_arr.append(post_val)
-        
-    return jsonify(post_arr)
 
+    return post_arr
+
+
+# REST interfaces
+@app.route('/api/posts/', methods=['GET'])
+def posts_get():
+    """
+        Gets all posts
+
+        Returns a JSON with their information, without content data
+    """
+    from ghostwriter.Post import Post, PostManager 
+    pm = PostManager()
+    posts = pm.getAllPosts()
+    if len(posts) <= 0:
+        return jsonify({'error': 'No posts found'}), 404
+ 
+    return jsonify(post_array_to_dictionary(posts))
+
+@app.route('/api/post/search', methods=['GET'])
+def posts_search(userid = None):
+    """
+        Search for posts, by date or title
+    """
+    vsearch = {}
+    title = request.args.get('title')
+    if not (title is None):
+        vsearch['title'] = title
+
+    cdate = request.args.get('cdate')
+    if not (cdate is None):
+        vsearch['creation_date'] = cdate
+
+    from ghostwriter.Post import Post, PostManager 
+    pm = PostManager()
+    
+    posts = pm.filterPosts(**vsearch)
+    if posts is None:
+        return jsonify({'error', 'No filter specified'}), 404 # TODO: think of a better error code
+
+    if len(posts) <= 0:
+        return jsonify({'error': 'No posts found'}), 404
+ 
+    return jsonify(post_array_to_dictionary(posts))
+     
 
 @app.route('/api/post/<int:id>/content', methods=['GET', 'PUT'])
 def post_get_content(id):
@@ -272,7 +303,49 @@ def user_manage(userid):
         return "",200
     else:
         return "",405
+
+@app.route('/api/user/<int:userid>/posts', methods=['GET'])
+def posts_author_search(userid):
+    """
+        Search for posts, by author
+    """
+    from ghostwriter.Post import Post, PostManager 
+    pm = PostManager()
     
+    posts = pm.filterPosts(author_id = userid)
+    
+    if len(posts) <= 0:
+        return jsonify({'error': 'No posts found'}), 404
+ 
+    return jsonify(post_array_to_dictionary(posts))
+    
+@app.route('/api/user/<int:userid>/posts/search', methods=['GET'])
+def posts_author_search_filter(userid):
+    """
+        Search for posts, by author
+    """
+    vsearch = {}
+    title = request.args.get('title')
+    if not (title is None):
+        vsearch['title'] = title
+
+    cdate = request.args.get('cdate')
+    if not (cdate is None):
+        vsearch['creation_date'] = cdate
+
+    vsearch['author_id'] = userid
+
+    from ghostwriter.Post import Post, PostManager 
+    pm = PostManager()
+    
+    posts = pm.filterPosts(**vsearch)
+    
+    if len(posts) <= 0:
+        return jsonify({'error': 'No posts found'}), 404
+ 
+    return jsonify(post_array_to_dictionary(posts))
+
+
 # Admin interface
 @app.route('/admin')
 def show_admin_panel():

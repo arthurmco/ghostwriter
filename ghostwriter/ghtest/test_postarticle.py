@@ -169,7 +169,8 @@ class PostArticleTestCase(unittest.TestCase):
                 follow_redirects=True)
         self.assertEqual(res.status,  '404 NOT FOUND')
 
-
+#
+#   Post search tests
 class PostSearchTestCase(unittest.TestCase):
     from flask import json
 
@@ -201,6 +202,7 @@ class PostSearchTestCase(unittest.TestCase):
         pm.addPost(po)
 
     def test_searchbyTitle(self):
+        import json
         self.create_post("Search One", "Post Search One", self.user)
         self.create_post("Normal One", "Post Normal One", self.user)
         self.create_post("Search Two", "Post Search Two", self.user)
@@ -210,7 +212,7 @@ class PostSearchTestCase(unittest.TestCase):
         self.create_post("What is this", "Post different", self.user)
 
         res = self.app.get('/api/post/search',
-                data = {
+                query_string = {
                         'title': 'Search'
                 }, follow_redirects=True)
 
@@ -219,6 +221,7 @@ class PostSearchTestCase(unittest.TestCase):
         self.assertEqual(3, len(post_data))
 
     def test_searchbyAuthor(self):
+        import json
         other = self.create_user('other', 'other')
         self.create_post("Search One", "Post Search One", self.user)
         self.create_post("Normal One", "Post Normal One", self.user)
@@ -236,20 +239,21 @@ class PostSearchTestCase(unittest.TestCase):
 
     def test_searchbyDate(self):
         from datetime import datetime
+        import json
         self.create_post("Search One", "Post Search One", self.user, 
-                datetime(2017, 7, 1))
+                datetime(2017, 7, 1, 1))
         self.create_post("Normal One", "Post Normal One", self.user)
         self.create_post("Search Two", "Post Search Two", self.user,
-                datetime(2017, 7, 1))
+                datetime(2017, 7, 1, 2))
         self.create_post("Normal Two", "Post Normal Two", self.user)
         self.create_post("Search THree", "Post Search Three", self.user,
-                datetime(2017, 7, 1))
+                datetime(2017, 7, 1, 3))
         self.create_post("Normal Three", "Post Normal Three", self.user)
         self.create_post("What is this", "Post different", self.user,
-                datetime(2017, 7, 1))
+                datetime(2017, 7, 1, 4))
 
         res = self.app.get('/api/post/search', 
-                data = {
+                query_string = {
                     'cdate': '2017-7-1',
                 }, follow_redirects=True)
 
@@ -259,6 +263,7 @@ class PostSearchTestCase(unittest.TestCase):
 
     def test_searchbyTitleandAuthor(self):
         other = self.create_user('other', 'other')
+        import json
         self.create_post("Search One", "Post Search One", self.user)
         self.create_post("Normal One", "Post Normal One", self.user)
         self.create_post("Search Two", "Post Search Two", other)
@@ -268,7 +273,7 @@ class PostSearchTestCase(unittest.TestCase):
         self.create_post("What is this", "Post different", self.user)
 
         res = self.app.get('/api/user/1/posts/search', 
-                data = {
+                query_string = {
                     'title': 'Search',
                 }, follow_redirects=True)
 
@@ -278,23 +283,25 @@ class PostSearchTestCase(unittest.TestCase):
 
     def test_searchbyDateandAuthor(self):
         from datetime import datetime
-        self.create_post("Search One", "Post Search One", self.other, 
-                datetime(2017, 7, 1))
-        self.create_post("Normal One", "Post Normal One", self.other)
+        import json
+        other = self.create_user('other', 'other')
+        self.create_post("Search One", "Post Search One", other, 
+                datetime(2017, 7, 1, 1))
+        self.create_post("Normal One", "Post Normal One", other)
         self.create_post("Search Two", "Post Search Two", self.user,
-                datetime(2017, 7, 1))
-        self.create_post("Normal Two", "Post Normal Two", self.other)
+                datetime(2017, 7, 1, 2))
+        self.create_post("Normal Two", "Post Normal Two", other)
         self.create_post("Search THree", "Post Search Three", self.user,
-                datetime(2017, 7, 1))
-        self.create_post("Normal Three", "Post Normal Three", self.other)
+                datetime(2017, 7, 1, 3))
+        self.create_post("Normal Three", "Post Normal Three", other)
         self.create_post("What is this", "Post different", self.user,
-                datetime(2017, 7, 1))
+                datetime(2017, 7, 1, 4))
 
         res = self.app.get('/api/user/1/posts/search', 
-                data = {
+                query_string = {
                     'cdate': '2017-7-1',
                 }, follow_redirects=True)
 
         self.assertEqual(res.status,  '200 OK')
         post_data = json.loads(res.data)
-        self.assertEqual(2, len(post_data))
+        self.assertEqual(3, len(post_data))

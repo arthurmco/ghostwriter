@@ -22,7 +22,7 @@ class MPost(models.Model):
         self.content = content
 
     def __repr__(self):
-        return '<Post title={} creation_date={}>'.format(self.title, self.creation_date)
+        return '<Post title={} creation_date={} user_id={}>'.format(self.title, self.creation_date, self.user_id)
 
 
 class MUser(models.Model):

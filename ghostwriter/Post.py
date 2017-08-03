@@ -85,19 +85,44 @@ class PostManager(object):
         post.setContent(mp.content)
         return post
     
-    def getPostsbyTitle(self, title):
+    def filterPosts(self, **kwargs):
         """ Retrieve all posts that contain 'title' in its title
             If none is found, return None
         """
-        mp = MPost.query.filter(MPost.title.find(title)).all()
+
+        mp = MPost.query.filter(MPost.title.contains(""))
+
+        if 'title' in kwargs:
+            mp = MPost.query.filter(MPost.title.contains(kwargs['title']))
+
+        if 'creation_date' in kwargs:
+            cdate_min = datetime.strptime(kwargs['creation_date'], '%Y-%m-%d')
+            cdate_max = datetime(cdate_min.year, cdate_min.month,
+                    cdate_min.day, 23, 59, 59)
+            if mp is None:
+                mp = MPost.query.filter(
+                        MPost.creation_date >= cdate_min).filter(
+                        MPost.creation_date <= cdate_max)
+            else:
+                mp = mp.filter(MPost.creation_date >= cdate_min).filter(
+                        MPost.creation_date <= cdate_max)
+    
+        if 'author_id' in kwargs:
+            if mp is None:
+                mp = MPost.query.filter_by(user_id = kwargs['author_id'])
+            else:
+                mp = mp.filter_by(user_id = kwargs['author_id'])
+        
         if mp is None:
             return None
 
+        mpq = mp.all()
+
         posts = []
-        for mpitem in mp:
-            post = Post(mp.user_id, mp.title, mp.creation_date)
-            post._id = mp.id
-            post.setContent(mp.content)
+        for mpitem in mpq:
+            post = Post(mpitem.user_id, mpitem.title, mpitem.creation_date)
+            post._id = mpitem.id
+            post.setContent(mpitem.content)
             posts.append(post)
 
         return posts
