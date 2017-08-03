@@ -8,6 +8,9 @@ python:
         - "3.6"
 env:
         - GHOSTWRITER_CONFIG=ghostwriter.cfg
-install: "pip install -e ."
-script: python -m ghostwriter.test
+install: 
+        - pip install -e .
+        - pip install coveralls
+script: coverage run --source=ghostwriter setup.py test
+after_success: coveralls
 

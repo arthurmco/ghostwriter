@@ -10,5 +10,5 @@ setup(
     install_requires=[
         'flask', "six", "enum34", 'flask_login', 'flask_sqlalchemy'
     ],
-    test_suite='ghostwriter.test',
+    test_suite='ghostwriter.ghtest',
 )
