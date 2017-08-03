@@ -163,6 +163,10 @@ def post_get(id):
              }
         return jsonify(jdata), 200
     elif request.method == 'DELETE':
+        #TODO: check parmissions
+        if current_user.uid != post.getOwner().uid:
+            return jsonify({'error': 'Not authorized to delete the pos'}),401
+
         pm.removePost(post)
         return "",200
     elif request.method == 'PUT':
@@ -422,7 +426,7 @@ def do_logout():
 @app.cli.command()
 def initdb():
     """ Initialise the database """
-    app.logger.info('Creating database')
+    print('Creating database')
     try:
         mm.create()
         from ghostwriter.User import User
@@ -430,8 +434,9 @@ def initdb():
         um = UserManager()
         um.addUser(User('admin', 'Administrator'), 'admin')
 
-        app.logger.info('Database created')
+        print('Database created')
     except Exception as e:
+        print('Error')
         app.logger.error('Error while creating database: {}'.format(e))
 
 app.secret_key = 'B1Ad99013yX R~XHHHHHHHHHH/,?RT'

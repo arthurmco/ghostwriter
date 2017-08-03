@@ -28,6 +28,10 @@ function delete_post(postid) {
 			404: function() {
 				merror.text('Could not find post, not deleted');
 				return
+			},
+			401: function() {
+				merror.text('Not authorized to delete the post');
+				return
 			}
 		},
 		error: function(xhr, strstatus) {
@@ -54,7 +58,11 @@ $(document).ready( function () {
 				pitem.append($("<td>"+val.creation_date+"</td>"));
 				pitem.append($("<td>"+val.owner.name+"</td>"));
 				pitem.append($("<td><a href='/admin/posts/edit/"+val.id+"/'>Edit</a></td>"));
-				pitem.append($("<td><a href='#' onClick='delete_post("+val.id+")'>Delete</a></td>"));
+				if(val.owner.id == {{ current_user.uid }}) 
+					pitem.append($("<td><a href='#' onClick='delete_post("+val.id+")'>Delete</a></td>"));
+				else
+					pitem.append($("<td></td>"));
+
 				table.append(pitem);
 
 			});
