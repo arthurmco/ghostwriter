@@ -42,7 +42,7 @@ class Post(object):
         
         ldot = summary.rfind('.')
         if ldot > 0:
-            return summary[:ldot]
+            return summary[:ldot+1]
 
         lnl = summary.rfind('\n')
         if lnl > 0:

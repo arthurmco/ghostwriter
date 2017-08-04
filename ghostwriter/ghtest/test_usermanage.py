@@ -22,9 +22,9 @@ class UserManageTestCase(unittest.TestCase):
         mm.drop()
 
     def create_user(self, name, pwd):
-        from ghostwriter.User import User
+        from ghostwriter.User import User, UserPerm
         from ghostwriter.UserManager import UserManager
-        u = User(name)
+        u = User(name, name, [UserPerm.ADMIN])
         umng = UserManager()
         umng.addUser(u, pwd)
         return u

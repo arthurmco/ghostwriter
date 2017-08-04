@@ -170,6 +170,49 @@ class PostArticleTestCase(unittest.TestCase):
         self.assertEqual(res.status,  '404 NOT FOUND')
 
 #
+#   Post composition
+class PostComposeTestCase(unittest.TestCase):
+    from flask import json
+
+    def setUp(self):
+        mm.setDatabaseURI('sqlite:////tmp/unittest.db')
+        mm.init()
+        mm.create()
+        self.app = app.test_client()
+        self.user = self.create_user('test', 'test')
+
+    def tearDown(self):
+        mm.drop()
+
+    def create_user(self, username, password):
+        from ghostwriter.User import User
+        from ghostwriter.UserManager import UserManager
+        u = User(username)
+        umng = UserManager()
+        umng.addUser(u, password)       
+        return u
+
+    def create_post(self, title, body, author, cdate=None):
+        from ghostwriter.Post import Post, PostManager
+        
+        po = Post(author.uid, title, cdate)
+        po.setContent(body)
+
+        return po
+
+    def testIfSummaryCorrect(self):
+        from ghostwriter.Post import Post
+
+        p = self.create_post("New Post",
+                """ This is a big summary
+                    Note that we will have a lot of lines, but it finish here.
+                    Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet """, self.user)
+        
+        cdata = p.getSummary()
+        self.assertEqual('.', cdata[-1])
+        self.assertNotEqual('...', cdata[-3:])
+
+#
 #   Post search tests
 class PostSearchTestCase(unittest.TestCase):
     from flask import json
