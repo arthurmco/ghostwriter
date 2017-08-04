@@ -107,6 +107,36 @@ class UserManageTestCase(unittest.TestCase):
         password_hash = hashlib.sha1(b'devasso').hexdigest()
         self.assertIsNotNone(um.registerLogIn(u, password_hash))
 
+    def test_permissionvalidationFull(self):
+        from ghostwriter.User import User, UserPerm
+
+        u = User("test", "Test", [UserPerm.MANAGEPOSTS, UserPerm.MANAGEUSERS])
+
+        self.assertTrue(u.checkPermission(UserPerm.CREATEPOST))
+        self.assertTrue(u.checkPermission(UserPerm.MANAGEPOSTS))
+        self.assertTrue(u.checkPermission(UserPerm.VIEWUSERS))
+        self.assertTrue(u.checkPermission(UserPerm.CREATEUSER))
+        self.assertTrue(u.checkPermission(UserPerm.MANAGEUSERS))
+        self.assertFalse(u.checkPermission(UserPerm.ADMIN))
+    
+    def test_permissionvalidationPartial(self):
+        from ghostwriter.User import User, UserPerm
+
+        u = User("test", "Test", [UserPerm.MANAGEPOSTS, UserPerm.VIEWUSERS])
+
+        self.assertTrue(u.checkPermission(UserPerm.CREATEPOST))
+        self.assertTrue(u.checkPermission(UserPerm.MANAGEPOSTS))
+        self.assertTrue(u.checkPermission(UserPerm.VIEWUSERS))
+        self.assertFalse(u.checkPermission(UserPerm.CREATEUSER))
+        self.assertFalse(u.checkPermission(UserPerm.MANAGEUSERS))
+        self.assertFalse(u.checkPermission(UserPerm.ADMIN))
+
+    def test_permissionvalidationNone(self):
+        from ghostwriter.User import User, UserCreationException, UserPerm
+
+        with self.assertRaises(UserCreationException):
+            u = User("test", "test", [])
+
     def test_update_user(self):
         from flask import json
         from ghostwriter.User import User

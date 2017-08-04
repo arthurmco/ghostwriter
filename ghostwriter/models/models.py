@@ -33,9 +33,11 @@ class MUser(models.Model):
     security_flags = models.Column(models.Integer)
     posts = models.relationship('MPost', backref='user', lazy='dynamic')
 
-    def __init__(self, username, password_hash, name=None):
+    def __init__(self, username, password_hash, security_flags, name=None):
         self.username = username
         self.password_hash = password_hash
+        self.security_flags = security_flags
+
         if name is None:
             self.name = username
         else:

@@ -7,6 +7,25 @@ class UserManager():
     def __init__(self):
         self.logged_list = []
 
+    def _castPermissionToNumber(self, permissions):
+        from ghostwriter.User import UserPerm
+
+        permn = 0
+        for perm in permissions:
+            permn |= perm.value
+
+        return permn
+
+    def _castNumberToPermission(self, num):
+        from ghostwriter.User import UserPerm
+
+        perms = []
+        for n in (p.value for p in UserPerm):
+            if (num & n):
+                perms.append(UserPerm(n))
+
+        return perms
+
     def registerLogIn(self, user, password_hash):
         """ Register login in database.
             Return the session token if login is OK, None if it isn't """
@@ -38,6 +57,7 @@ class UserManager():
 
         mus.username = user.username
         mus.name = user.name
+        mus.security_flags = self._castPermissionToNumber(user.permissions)
         models.session.commit()
         return True        
 
@@ -56,7 +76,7 @@ class UserManager():
             return []
         
         for muitem in mu:
-            u = User(mu.username, mu.name)
+            u = User(mu.username, mu.name, self._castNumberToPermission(mu.security_flags))
             u._id = mu.id
             us.append(u)
 
@@ -67,7 +87,7 @@ class UserManager():
         if mu is None:
             return None
 
-        u = User(mu.username, mu.name)
+        u = User(mu.username, mu.name, self._castNumberToPermission(mu.security_flags))
         u._id = mu.id
         return u;
 
@@ -78,7 +98,7 @@ class UserManager():
 
         us = []
         for mu in mus:
-            u = User(mu.username, mu.name)
+            u = User(mu.username, mu.name, self._castNumberToPermission(mu.security_flags))
             u._id = mu.id
             us.append(u)
 
@@ -112,7 +132,7 @@ class UserManager():
     def addUser(self, user, password):
         import hashlib
         password_hash = hashlib.sha1(password.encode('utf-8')).hexdigest()
-        mu = MUser(user.username, password_hash, user.name)
+        mu = MUser(user.username, password_hash, self._castPermissionToNumber(user.permissions), user.name)
         models.session.add(mu)
         models.session.commit()
         
