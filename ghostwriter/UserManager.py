@@ -91,19 +91,6 @@ class UserManager():
         u._id = mu.id
         return u;
 
-    def getAllUsers(self):
-        mus = MUser.query.all()
-        if mus is None:
-            return []
-
-        us = []
-        for mu in mus:
-            u = User(mu.username, mu.name, self._castNumberToPermission(mu.security_flags))
-            u._id = mu.id
-            us.append(u)
-
-        return us
-
     def removeUser(self, user):
         """ Remove an user.
             Return false if user doesn't exist
