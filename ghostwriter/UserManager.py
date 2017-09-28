@@ -1,4 +1,4 @@
-from ghostwriter.models.models import MUser, models
+from ghostwriter.models.models import MUser, MPost, models
 from ghostwriter.User import User
 from datetime import datetime
 
@@ -67,7 +67,7 @@ class UserManager():
         """
         us = []
 
-        muq = MUser.query.order_by(MPost.id).offset(start)
+        muq = MUser.query.order_by(MUser.id).offset(start)
         if not (end is None):
             muq = muq.limit(end)
 
@@ -76,8 +76,8 @@ class UserManager():
             return []
         
         for muitem in mu:
-            u = User(mu.username, mu.name, self._castNumberToPermission(mu.security_flags))
-            u._id = mu.id
+            u = User(muitem.username, muitem.name, self._castNumberToPermission(muitem.security_flags))
+            u._id = muitem.id
             us.append(u)
 
         return us
