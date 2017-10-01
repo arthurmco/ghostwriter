@@ -155,3 +155,26 @@ class UserManageTestCase(unittest.TestCase):
         self.assertEqual('Ixpertinho', u.name)
         self.assertEqual('garoto', u.username)
 
+    def test_change_pass(self):
+        from flask import json
+        from ghostwriter.User import User
+        from ghostwriter.UserManager import UserManager
+
+        self.authenticate()
+        u = self.create_user('malakoi', 'devasso')
+        
+        res = self.app.put('/api/user/2/', data = {
+                'name': 'Malakoi', 
+                'username': 'malakoi',
+                'old_password': 'devasso',
+                'password': 'refutado'
+            }, follow_redirects=True)
+        self.assertEqual('200 OK', res.status)
+
+        self.app.get('/admin/logoff', follow_redirects=True)
+
+        self.username = 'malakoi'
+        self.password = 'refutado'
+        self.authenticate()
+        
+

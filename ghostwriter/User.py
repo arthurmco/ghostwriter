@@ -64,6 +64,15 @@ class User(object):
 
         return list(set(self._permissions + addPermissions)) 
 
+    def checkPassword(self, pwd, umng):
+        import hashlib
+        """ Check the password against the one we have in the db.
+            Return true if matched, false if not 
+        """
+        password_hash = hashlib.sha1(pwd.encode('utf-8')).hexdigest()
+        return umng.comparePassword(self, password_hash)
+
+
     def login(self, password, umng):
         import hashlib
         """ Log in the user. Uses SHA1 to encode the password """

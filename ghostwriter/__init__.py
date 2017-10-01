@@ -288,10 +288,17 @@ def user_manage(userid):
         jdata = {'id': u.uid,
                  'username': u.username,
                  'name': u.name}
+
         return jsonify(jdata), 200
     elif request.method == "PUT":
         u.username = request.form['username']
         u.name = request.form['name']
+        
+        if 'old_password' in request.form:
+            if u.checkPassword(request.form['old_password'], um):
+                if 'password' in request.form:
+                    um.updatePassword(u, request.form['password'])
+
         um.updateUser(u)
         jdata = {'id': u.uid,
                  'username': u.username,

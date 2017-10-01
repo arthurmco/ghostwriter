@@ -52,6 +52,9 @@ function run_edit_user(id) {
 	var name = $("input#name").prop('value');
 	var ierror = $("#error");
 	var imsg = $("#success");
+	var old_password = $("input#oldpassword").prop("value");
+	var password = $("input#password").prop("value");
+	var password2 = $("input#password2").prop("value");
 	
 	if (username.length <= 1) {
 		ierror.text('Please type the login/username');
@@ -62,11 +65,33 @@ function run_edit_user(id) {
 		ierror.text('Please type the wished name');
 		return;
 	}
+	
+	if (password != password2) {
+		ierror.text('Passwords are different');
+		return;
+	}
+
+	/* Validate only if we have something in the old and new passwords */
+	if (old_password.length <= 4) {
+		old_password = null;
+	}
+
+	if (password2.length <= 4) {
+		password2 = null;
+		if (password.length > 4) {
+			ierror.text("Type the password again");
+			return;
+		}
+	}
 
 
 	var fd = new FormData();
 	fd.append('username', username);
 	fd.append('name', name);
+	if (old_password && password2) {
+		fd.append('old_password', old_password);
+		fd.append('password', password2);
+	}
 
 	$.ajax({
 		cache: false,

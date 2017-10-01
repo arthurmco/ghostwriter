@@ -26,13 +26,21 @@ class UserManager():
 
         return perms
 
-    def registerLogIn(self, user, password_hash):
-        """ Register login in database.
-            Return the session token if login is OK, None if it isn't """
+    def comparePassword(self, user, password_hash):
+        """ Compare passwords between the user and the one specified in
+            password_hash. Return true if match, false if not """
         from sqlalchemy import and_
         mu = MUser.query.filter(and_(MUser.username == user.username, 
                                 MUser.password_hash == password_hash))
         if (len(mu.all()) <= 0):
+            return False
+
+        return True
+
+    def registerLogIn(self, user, password_hash):
+        """ Register login in database.
+            Return the session token if login is OK, None if it isn't """
+        if (not self.comparePassword(user, password_hash)):
             return None
 
         session_token = str(datetime.utcnow()).encode('utf-8')
@@ -60,6 +68,18 @@ class UserManager():
         mus.security_flags = self._castPermissionToNumber(user.permissions)
         models.session.commit()
         return True        
+
+    def updatePassword(self, user, newpass):
+        import hashlib
+        
+        mus = MUser.query.get(user.uid)
+        if mus is None:
+            return False
+
+        password_hash = hashlib.sha1(newpass.encode('utf-8')).hexdigest()
+        mus.password_hash = password_hash 
+        models.session.commit()
+        return True
 
     def getAllUsers(self, start=0, end=None):
         """ Get all posts by IDorder, from start to start+end.
