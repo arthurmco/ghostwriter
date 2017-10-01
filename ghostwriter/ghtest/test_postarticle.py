@@ -262,6 +262,29 @@ class PostSearchTestCase(unittest.TestCase):
         self.assertEqual(res.status,  '200 OK')
         post_data = json.loads(res.data)
         self.assertEqual(3, len(post_data))
+    
+    def test_searchAllNoneFound(self):
+        import json
+        other = self.create_user('other', 'other')
+        res = self.app.get('/api/posts', follow_redirects=True)
+        self.assertEqual(res.status,  '404 NOT FOUND')
+
+    def test_searchAll(self):
+        import json
+        other = self.create_user('other', 'other')
+        self.create_post("Search One", "Post Search One", self.user)
+        self.create_post("Normal One", "Post Normal One", self.user)
+        self.create_post("Search Two", "Post Search Two", other)
+        self.create_post("Normal Two", "Post Normal Two", other)
+        self.create_post("Search THree", "Post Search Three", other)
+        self.create_post("Normal Three", "Post Normal Three", other)
+        self.create_post("What is this", "Post different", self.user)
+
+        res = self.app.get('/api/posts', follow_redirects=True)
+
+        self.assertEqual(res.status,  '200 OK')
+        post_data = json.loads(res.data)
+        self.assertEqual(7, len(post_data))
 
     def test_searchbyAuthor(self):
         import json
